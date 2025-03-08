@@ -8,9 +8,49 @@ from django.contrib import messages
 from django.conf import settings
 import random
 from django.core.mail import send_mail
+from .forms import SignupForm
+from leadsapp.models import Lead, LeadSource
 
 def index(request):
     return render(request,"index.html")
+
+
+def signup_user(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            # Create the user
+            user = form.save()
+            user.user_type = 'viewer'  # Assign default user type
+            user.save()
+
+            # Get or create the default LeadSource (e.g., 'web_form')
+            lead_source, created = LeadSource.objects.get_or_create(
+                source='web_form',  # Default source
+                defaults={'description': 'Leads from web form signups'}
+            )
+
+            # Create the lead with default values
+            lead = Lead(
+                first_name=user.first_name,  # Use the user's first name
+                last_name=user.last_name,   # Use the user's last name
+                email=user.email,            # Use the user's email
+                phone_number='',             # Default empty phone number
+                source=lead_source,          # Assign the LeadSource instance
+                status='new',                # Default status
+                assigned_to=None,            # No assigned user by default
+                notes=None,                 # No default notes
+                tags=None                 # No default tags 
+            )
+            lead.save()
+
+            # Log the user in
+            login(request, user)
+            return redirect('viewerhome')  # Redirect to the home page
+    else:
+        form = SignupForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
 
 def login_user(request):
     if request.method == 'POST':
