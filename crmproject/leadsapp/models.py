@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -13,7 +14,7 @@ class LeadSource(models.Model):
     source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='web_form')  # Default source
     description = models.TextField(blank=True, null=True)
 
-    def __str__(self):
+    def _str_(self):
         return self.source
 
 class Lead(models.Model):
@@ -36,5 +37,5 @@ class Lead(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.first_name} {self.last_name}"

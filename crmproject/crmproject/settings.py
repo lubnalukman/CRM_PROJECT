@@ -134,7 +134,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 ADMIN_SITE_HEADER = "CRM ADMINISTRATION"
 
 LOGOUT_REDIRECT_URL='login'
-LOGIN_REDIRECT_URL='home'
+#LOGIN_REDIRECT_URL=''
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

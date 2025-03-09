@@ -43,39 +43,80 @@ def signup_user(request):
                 tags=None                 # No default tags 
             )
             lead.save()
-
-            # Log the user in
-            login(request, user)
-            return redirect('viewerhome')  # Redirect to the home page
     else:
         form = SignupForm()
     return render(request, 'registration/signup.html', {'form': form})
 
 
-def login_user(request):
+# views.py
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm
+
+def custom_login(request):
     if request.method == 'POST':
-        uname = request.POST['username']
-        pwd = request.POST['password']
-        
-        user = authenticate(request, username=uname, password=pwd)
-        
-        if user is not None:
-            login(request, user)
-            if user.user_type == 'admin':
-                return redirect('admin_home')  
-            elif user.user_type == 'sales_manager':
-                return redirect('sales_manager_home')  
-            elif user.user_type == 'sales_rep':
-                return redirect('sales_rep_home')  
-            elif user.user_type == 'viewer':
-                return redirect('viewer_home') 
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                # Redirect based on user type
+                if user.user_type == 'admin':
+                    return redirect('admin_dashboard')
+                elif user.user_type == 'sales_manager':
+                    return redirect('manager_dashboard')
+                elif user.user_type == 'sales_rep':
+                    return redirect('salesrep_dashboard')
+                else:
+                    # Default redirect if usertype doesn't match any case
+                    return redirect('viewer_dashboard') 
             else:
-                return redirect('home')  
+                # Return an 'invalid login' error message
+                return render(request, 'registration/login.html', {
+                    'form': form,
+                    'error_message': 'Invalid username or password'
+                })
         else:
-            messages.error(request, 'Invalid username or password.')
-            return redirect('login') 
+            # Form is invalid
+            return render(request, 'registration/login.html', {
+                'form': form,
+                'error_message': 'Invalid form submission'
+            })
     else:
-        return render(request, 'registration/login.html')
+        # GET request - show empty login form
+        form = AuthenticationForm()
+        return render(request, 'registration/login.html', {'form': form})
+
+def admin_dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    if request.user.user_type != 'admin':
+        return redirect('custom_login')  # Or some unauthorized page
+    return render(request, 'admin_dashboard.html')
+
+def manager_dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    if request.user.user_type != 'sales_manager':
+        return redirect('custom_login')
+    return render(request, 'salesmanager_dashboard.html')
+
+def salesrep_dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    if request.user.user_type != 'sales_rep':
+        return redirect('custom_login')
+    return render(request, 'salesrep_dashboard.html')
+
+def viewer_dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    if request.user.user_type != 'viewer':
+        return redirect('custom_login')
+    return render(request, 'viewer_dashboard.html')
 
 
 def logout_user(request):
