@@ -1,71 +1,88 @@
-from django.shortcuts import render
 
-# Create your views here.
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Lead
-from usersapp.models import User
+from usersapp.views import custom_login
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Lead, LeadSource, User
+from .forms import LeadForm
+from django.core.paginator import Paginator
 
 
-
-'''@login_required
+def check_user_access(request, user_type, template_name):
+    """Checks if the user is authenticated and has the correct user type."""
+    if not request.user.is_authenticated or request.user.user_type != user_type:
+        return redirect('custom_login')
+    return render(request, template_name)
 
 def admin_dashboard(request):
-    # System Overview
-    total_leads = Lead.objects.count()
-    new_leads = Lead.objects.filter(status='New').count()
-    converted_leads = Lead.objects.filter(status='Converted').count()
-    lost_leads = Lead.objects.filter(status='Lost').count()
+    return check_user_access(request, 'admin', 'admin_dashboard.html')
 
-    # User Management
-    total_users = User.objects.count()
-    active_users = User.objects.filter(is_active=True).count()
-    admin_count = User.objects.filter(user_type='ADMIN').count()
-    sales_manager_count = User.objects.filter(user_type='SALES_MANAGER').count()
-    sales_rep_count = User.objects.filter(user_type='SALES_REP').count()
-    viewer_count = User.objects.filter(user_type='VIEWER').count()
+def manager_dashboard(request):
+    return check_user_access(request, 'sales_manager', 'salesmanager_dashboard.html')
 
-    # Recent Activity
-   # recent_activity = ActivityLog.objects.all().order_by('-timestamp')[:10]
-
-    # Notifications (example)
-    notifications = [
-        {'message': '5 new leads added today.'},
-        {'message': '2 leads converted this week.'},
-    ]
-
-    return render(request, 'admin_dashboard.html', {
-        'total_leads': total_leads,
-        'new_leads': new_leads,
-        'converted_leads': converted_leads,
-        'lost_leads': lost_leads,
-        'total_users': total_users,
-        'active_users': active_users,
-        'admin_count': admin_count,
-        'sales_manager_count': sales_manager_count,
-        'sales_rep_count': sales_rep_count,
-        'viewer_count': viewer_count,
-        #'recent_activity': recent_activity,
-        'notifications': notifications,
-    })
-
-
-# Sales Rep Dashboard
-@login_required
-@user_passes_test(lambda user: user.user_type == 'sales_rep')
 def salesrep_dashboard(request):
-    leads = Lead.objects.filter(assigned_to=request.user)
-    return render(request, 'salesrep_dashboard.html', {'leads': leads})
+    return check_user_access(request, 'sales_rep', 'salesrep_dashboard.html')
 
-# Sales Manager Dashboard
-@login_required
-@user_passes_test(lambda user: user.user_type == 'sales_manager')
-def salesmanager_dashboard(request):
-    leads = Lead.objects.all()
-    return render(request, 'salesmanager_dashboard.html', {'leads': leads})
-
-# Viewer Dashboard
-
-#@user_passes_test(lambda user: user.user_type == 'viewer')
 def viewer_dashboard(request):
-    return render(request, 'viewer_dashboard.html')'''
+    return check_user_access(request, 'viewer', 'viewer_dashboard.html')
+
+@login_required
+def admin_view(request):
+    # Ensure the user is an admin
+    if request.user.user_type != 'admin':
+        return redirect('custom_login')
+    
+    leads = Lead.objects.all()
+    users = User.objects.all()
+    return render(request, 'admin_dashboard.html', {'leads': leads, 'users': users})
+
+@login_required
+def all_leads(request):
+    # Fetch all leads
+    leads = Lead.objects.all()
+    paginator = Paginator(leads, 10)  # Show 10 leads per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'all_leads.html', {'page_obj': page_obj})
+
+@login_required
+def create_lead(request):
+    if request.method == 'POST':
+        form = LeadForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_dashboard')
+    else:
+        form = LeadForm()
+    return render(request, 'create_lead.html', {'form': form})
+
+@login_required
+def edit_lead(request, lead_id):
+    lead = get_object_or_404(Lead, id=lead_id)
+    if request.method == 'POST':
+        form = LeadForm(request.POST, instance=lead)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_dashboard')
+    else:
+        form = LeadForm(instance=lead)
+    return render(request, 'edit_lead.html', {'form': form})
+
+@login_required
+def delete_lead(request, lead_id):
+    lead = get_object_or_404(Lead, id=lead_id)
+    lead.delete()
+    return redirect('admin_dashboard')
+
+@login_required
+def lead_detail(request, lead_id):
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    
+    # Fetch the lead or return a 404 error
+    lead = get_object_or_404(Lead, id=lead_id)
+    
+    # Render the lead detail template
+    return render(request, 'lead_detail.html', {'lead': lead})
+

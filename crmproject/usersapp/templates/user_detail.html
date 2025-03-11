@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
+        <h2 class="text-xl font-semibold mb-4">User Details</h2>
+        <div class="space-y-4">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>First Name:</strong> {{ user.first_name }}</p>
+            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>User Type:</strong> {{ user.user_type }}</p>
+            <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+            <p><strong>Verified:</strong> {{ user.is_verified|yesno:"Yes,No" }}</p>
+            <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+        </div>
+        <div class="mt-6">
+            <a href="{% url 'edit_user' user.id %}" class="bg-blue-500 text-white px-4 py-2 rounded">Edit User</a>
+            <a href="{% url 'admin_dashboard' %}" class="bg-gray-500 text-white px-4 py-2 rounded ml-2">Back to Dashboard</a>
+        </div>
+    </div>
+{% endblock %}

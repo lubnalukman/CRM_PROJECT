@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
@@ -10,6 +10,10 @@ import random
 from django.core.mail import send_mail
 from .forms import SignupForm
 from leadsapp.models import Lead, LeadSource
+from django.contrib.auth.decorators import login_required
+from usersapp.forms import UserForm
+from django.core.paginator import Paginator
+
 
 def index(request):
     return render(request,"index.html")
@@ -118,10 +122,72 @@ def viewer_dashboard(request):
         return redirect('custom_login')
     return render(request, 'viewer_dashboard.html')
 
+@login_required
+def all_users(request):
+    # Fetch all users
+    users = User.objects.all()
+    paginator=Paginator(users,10)
+    page_number=request.GET.get('page')
+    page_obj=paginator.get_page(page_number)
+    
+    # Render the template with the users
+    return render(request, 'all_users.html',{'page_obj': page_obj})
+
+@login_required
+def create_user(request):
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_dashboard')
+    else:
+        form = UserForm()
+    return render(request, 'create_user.html', {'form': form})
+
+
+@login_required
+def edit_user(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_dashboard')
+    else:
+        form = UserForm(instance=user)
+    return render(request, 'edit_user.html', {'form': form})
+
+@login_required
+def delete_user(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    return redirect('admin_dashboard')
+
+@login_required
+def user_detail(request, user_id):
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return redirect('custom_login')
+    
+    # Fetch the user or return a 404 error
+    user = get_object_or_404(User, id=user_id)
+    
+    # Render the user detail template
+    return render(request, 'user_detail.html', {'user': user})
 
 def logout_user(request):
     logout(request)
-    messages.success(request,"You have been logged out")
+    messages.success(request, "You have been logged out")
+    return redirect('index')  # Redirect to the login page or any other page
 
 def reset_password(request):
     if request.method == 'POST':

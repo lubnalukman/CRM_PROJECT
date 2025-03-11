@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="flex justify-center mt-10">
+        <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-6xl">
+            <a href="{% url 'create_lead' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Lead</a>
+            <h2 class="text-xl font-semibold mb-4 text-center">All Leads</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto border-collapse text-sm">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left border-b">Name</th>
+                            <th class="px-4 py-2 text-left border-b">Email</th>
+                            <th class="px-4 py-2 text-left border-b">Source</th>
+                            <th class="px-4 py-2 text-left border-b">Status</th>
+                            <th class="px-4 py-2 text-left border-b">Assigned To</th>
+                            <th class="px-4 py-2 text-left border-b">Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in page_obj %}
+                        <tr class="border-b hover:bg-gray-100">
+                            <td class="px-4 py-2">
+                                <a href="{% url 'lead_detail' lead.id %}" class="text-blue-500 hover:underline">
+                                    {{ lead.first_name }} {{ lead.last_name }}
+                                </a>
+                            </td>
+                            <td class="px-4 py-2">{{ lead.email }}</td>
+                            <td class="px-4 py-2">{{ lead.source.source }}</td>
+                            <td class="px-4 py-2">{{ lead.get_status_display }}</td>
+                            <td class="px-4 py-2">{{ lead.assigned_to.username }}</td>
+                            <td class="px-4 py-2">{{ lead.tags }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="mt-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1" class="bg-blue-500 text-white px-4 py-2 rounded">First</a>
+                            <a href="?page={{ page_obj.previous_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Previous</a>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="text-gray-700">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </div>
+                    <div>
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded">Next</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Last</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

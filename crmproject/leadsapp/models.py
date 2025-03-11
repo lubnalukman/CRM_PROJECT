@@ -14,7 +14,7 @@ class LeadSource(models.Model):
     source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='web_form')  # Default source
     description = models.TextField(blank=True, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.source
 
 class Lead(models.Model):
@@ -37,5 +37,5 @@ class Lead(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.first_name} {self.last_name}"

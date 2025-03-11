@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
+        <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
+        <div class="space-y-4">
+            <p><strong>Name:</strong> {{ lead.first_name }} {{ lead.last_name }}</p>
+            <p><strong>Email:</strong> {{ lead.email }}</p>
+            <p><strong>Phone Number:</strong> {{ lead.phone_number }}</p>
+            <p><strong>Source:</strong> {{ lead.source.source }}</p>
+            <p><strong>Status:</strong> {{ lead.status }}</p>
+            <p><strong>Tags:</strong> {{ lead.tags }}</p>
+            <p><strong>Notes:</strong> {{ lead.notes }}</p>
+            <p><strong>Assigned To:</strong> {{ lead.assigned_to.username }}</p>
+            <p><strong>Created At:</strong> {{ lead.created_at }}</p>
+            <p><strong>Updated At:</strong> {{ lead.updated_at }}</p>
+        </div>
+        <div class="mt-6">
+            <a href="{% url 'edit_lead' lead.id %}" class="bg-blue-500 text-white px-4 py-2 rounded">Edit Lead</a>
+            <a href="{% url 'delete_lead' lead.id %}" class="text-red-500 hover:underline ml-2">Delete</a>
+            
+        </div>
+    </div>
+{% endblock %}
