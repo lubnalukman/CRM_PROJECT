@@ -6,6 +6,10 @@
     <title>CRM Admin Dashboard</title>
     <!-- Font Awesome for icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+   
+        <script src="https://cdn.tailwindcss.com"></script>
+   
+    
     <style>
         /* Basic CSS for layout */
         * {
@@ -124,20 +128,7 @@
             </a>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <h1>Dashboard</h1>
-                <div class="user-info">
-                    <span>Welcome, {{ user.username }}</span>
-                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="logout-btn">Logout</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        
        
    
     {% block content %}

@@ -175,20 +175,7 @@
             </a>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <h1>Dashboard</h1>
-                <div class="user-info">
-                    <span>Welcome, {{ user.username }}</span>
-                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="logout-btn">Logout</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        
     <!-- Dashboard Cards -->
     <div class="dashboard-cards">
         <div class="card">

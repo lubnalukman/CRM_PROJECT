@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-center mt-10">
+    <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
+        <h2 class="text-xl font-semibold text-center mb-4">Lead Sources</h2>
+        
+        <ul class="space-y-2">
+            {% for source in sources %}
+            <li class="p-2 border-b">{{ source.source }} - <span class="text-gray-500">{{ source.description }}</span></li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'create_lead_source' %}" class="block text-center text-blue-500 mt-4 hover:underline">
+            + Add New Source
+        </a>
+    </div>
+</div>
+{% endblock %}

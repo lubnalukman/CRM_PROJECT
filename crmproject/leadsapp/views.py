@@ -5,7 +5,12 @@ from django.contrib.auth.decorators import login_required
 from .models import Lead, LeadSource, User
 from .forms import LeadForm
 from django.core.paginator import Paginator
+from .forms import LeadSourceForm
+from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth import get_user_model 
 
+User = get_user_model()
 
 def check_user_access(request, user_type, template_name):
     """Checks if the user is authenticated and has the correct user type."""
@@ -39,22 +44,44 @@ def admin_view(request):
 def all_leads(request):
     # Fetch all leads
     leads = Lead.objects.all()
-    paginator = Paginator(leads, 10)  # Show 10 leads per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
     
-    return render(request, 'all_leads.html', {'page_obj': page_obj})
+    return render(request, 'all_leads.html', {'leads': leads})
 
 @login_required
 def create_lead(request):
     if request.method == 'POST':
         form = LeadForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('admin_dashboard')
+            lead = form.save(commit=False)  # Don't save yet
+
+            source_id = request.POST.get('source')
+            if source_id:
+                try:
+                    lead.source = LeadSource.objects.get(id=source_id)  # Assign LeadSource object
+                except LeadSource.DoesNotExist:
+                    messages.error(request, "Invalid source selected.")
+                    return redirect('create_lead')
+
+            assigned_user_id = request.POST.get('assigned_to')
+            if assigned_user_id:
+                try:
+                    lead.assigned_to = User.objects.get(id=assigned_user_id)  # Assign user
+                except User.DoesNotExist:
+                    messages.error(request, "Invalid assigned user.")
+                    return redirect('create_lead')
+            lead.save()  # Now save the lead
+            messages.success(request, "Lead created successfully!")
+            return redirect('all_leads')
+        else:
+            print("Form Errors:", form.errors)
+            messages.error(request, "There was an error creating the lead. Please check the form.")
     else:
         form = LeadForm()
-    return render(request, 'create_lead.html', {'form': form})
+
+    users = User.objects.all()  # Fetch all users for the dropdown
+    lead_sources = LeadSource.objects.all()  # Fetch LeadSource options for dropdown
+
+    return render(request, 'create_lead.html', {'form': form, 'users': users})
 
 @login_required
 def edit_lead(request, lead_id):
@@ -86,3 +113,16 @@ def lead_detail(request, lead_id):
     # Render the lead detail template
     return render(request, 'lead_detail.html', {'lead': lead})
 
+def lead_source_list(request):
+    sources=LeadSource.objects.all()
+    return render (request,"lead_sources.html",{"sources":sources})
+
+def create_lead_source(request):
+    if request.method == 'POST':
+        form=LeadSourceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lead_source')
+    else:
+        form = LeadSourceForm
+    return render(request, "create_lead_source.html", {"form": form})

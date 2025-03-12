@@ -1,62 +1,63 @@
+
+
 {% extends 'base.html' %}
 
 {% block content %}
     <div class="flex justify-center mt-10">
-        <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-6xl">
-            <a href="{% url 'create_lead' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Lead</a>
-            <h2 class="text-xl font-semibold mb-4 text-center">All Leads</h2>
-            
-            <div class="overflow-x-auto">
-                <table class="min-w-full table-auto border-collapse text-sm">
-                    <thead class="bg-gray-200">
-                        <tr>
-                            <th class="px-4 py-2 text-left border-b">Name</th>
-                            <th class="px-4 py-2 text-left border-b">Email</th>
-                            <th class="px-4 py-2 text-left border-b">Source</th>
-                            <th class="px-4 py-2 text-left border-b">Status</th>
-                            <th class="px-4 py-2 text-left border-b">Assigned To</th>
-                            <th class="px-4 py-2 text-left border-b">Tags</th>
+        <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-6xl">
+            <!-- Create Lead Button -->
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-gray-700">All Leads</h2>
+                <a href="{% url 'create_lead' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
+                    + Create Lead
+                </a>
+                <a href="{% url 'create_lead_source' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
+                    + Create Lead Source
+                </a>
+                <a href="{% url 'lead_source' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
+                    View Lead Source
+                </a>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-md">
+                <table class="w-full table-auto border-collapse text-sm text-gray-700">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Name</th>
+                            <th class="py-3 px-6 text-left">Email</th>
+                            <th class="py-3 px-6 text-left">Source</th>
+                            <th class="py-3 px-6 text-left">Status</th>
+                            <th class="py-3 px-6 text-left">Assigned To</th>
+                            <th class="py-3 px-6 text-left">Tags</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for lead in page_obj %}
-                        <tr class="border-b hover:bg-gray-100">
-                            <td class="px-4 py-2">
-                                <a href="{% url 'lead_detail' lead.id %}" class="text-blue-500 hover:underline">
+                    <tbody class="text-gray-600 text-sm">
+                        {% for lead in leads %}
+                        <tr class="border-b border-gray-300 hover:bg-gray-100 transition">
+                            <td class="py-3 px-6">
+                                <a href="{% url 'lead_detail' lead.id %}" class="text-blue-500 hover:underline font-medium">
                                     {{ lead.first_name }} {{ lead.last_name }}
                                 </a>
                             </td>
-                            <td class="px-4 py-2">{{ lead.email }}</td>
-                            <td class="px-4 py-2">{{ lead.source.source }}</td>
-                            <td class="px-4 py-2">{{ lead.get_status_display }}</td>
-                            <td class="px-4 py-2">{{ lead.assigned_to.username }}</td>
-                            <td class="px-4 py-2">{{ lead.tags }}</td>
+                            <td class="py-3 px-6">{{ lead.email }}</td>
+                            <td class="py-3 px-6">{{ lead.source.source }}</td>
+                            <td class="py-3 px-6">
+                                <span class="px-2 py-1 text-xs font-semibold text-white rounded {% if lead.get_status_display == 'New' %} bg-green-500 {% elif lead.get_status_display == 'Contacted' %} bg-yellow-500 {% else %} bg-gray-500 {% endif %}">
+                                    {{ lead.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-6">{{ lead.assigned_to.username }}</td>
+                            <td class="py-3 px-6">
+                                <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">{{ lead.tags }}</span>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination Controls -->
-            <div class="mt-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        {% if page_obj.has_previous %}
-                            <a href="?page=1" class="bg-blue-500 text-white px-4 py-2 rounded">First</a>
-                            <a href="?page={{ page_obj.previous_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Previous</a>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <span class="text-gray-700">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                    </div>
-                    <div>
-                        {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded">Next</a>
-                            <a href="?page={{ page_obj.paginator.num_pages }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Last</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 {% endblock %}
