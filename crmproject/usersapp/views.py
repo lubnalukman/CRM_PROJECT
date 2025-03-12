@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from django.conf import settings
@@ -13,49 +13,65 @@ from leadsapp.models import Lead, LeadSource
 from django.contrib.auth.decorators import login_required
 from usersapp.forms import UserForm
 from django.core.paginator import Paginator
+from django.contrib.auth import get_user_model 
+from django.contrib.auth.forms import AuthenticationForm
+
 
 
 def index(request):
     return render(request,"index.html")
+
+User = get_user_model()
 
 
 def signup_user(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            # Create the user
-            user = form.save()
+            # Create and save the user
+            user = form.save(commit=False)
             user.user_type = 'viewer'  # Assign default user type
             user.save()
 
-            # Get or create the default LeadSource (e.g., 'web_form')
-            lead_source, created = LeadSource.objects.get_or_create(
-                source='web_form',  # Default source
-                defaults={'description': 'Leads from web form signups'}
-            )
+            # Log the user in after successful signup
+            #login(request, user)
 
-            # Create the lead with default values
-            lead = Lead(
-                first_name=user.first_name,  # Use the user's first name
-                last_name=user.last_name,   # Use the user's last name
-                email=user.email,            # Use the user's email
-                phone_number='',             # Default empty phone number
-                source=lead_source,          # Assign the LeadSource instance
-                status='new',                # Default status
-                assigned_to=None,            # No assigned user by default
-                notes=None,                 # No default notes
-                tags=None                 # No default tags 
-            )
-            lead.save()
+            try:
+                # Fetch an existing LeadSource with 'web_form', or create if none exists
+                lead_source = LeadSource.objects.filter(source='web_form').first()
+                
+                if not lead_source:
+                    lead_source = LeadSource.objects.create(
+                        source='web_form',
+                        description='Leads from web form signups'
+                    )
+
+                # Create the lead with user details
+                lead = Lead.objects.create(
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email,
+                    phone_number='',  # Empty string instead of None
+                    source=lead_source,  # Assign the LeadSource instance
+                    status='new',  # Default status
+                    assigned_to=None,  # No assigned user by default
+                    notes='',  # Empty string instead of None
+                    tags=''  # Empty string instead of None
+                )
+
+                # Redirect after successful signup
+                return redirect('custom_login')  # Change to your actual dashboard URL
+
+            except Exception as e:
+                print(f"Error creating lead: {e}")  # Log the error
+                user.delete()  # Rollback user creation if lead creation fails
+                form.add_error(None, "An error occurred while creating the lead. Please try again.")
+
     else:
         form = SignupForm()
+
     return render(request, 'registration/signup.html', {'form': form})
 
-
-# views.py
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm
 
 def custom_login(request):
     if request.method == 'POST':
@@ -122,16 +138,17 @@ def viewer_dashboard(request):
         return redirect('custom_login')
     return render(request, 'viewer_dashboard.html')
 
+
 @login_required
 def all_users(request):
     # Fetch all users
     users = User.objects.all()
-    paginator=Paginator(users,10)
-    page_number=request.GET.get('page')
-    page_obj=paginator.get_page(page_number)
+    paginator = Paginator(users, 10)  # 10 users per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
-    # Render the template with the users
-    return render(request, 'all_users.html',{'page_obj': page_obj})
+    # Render the template with the paginated users
+    return render(request, 'all_users.html', {'page_obj': page_obj})
 
 @login_required
 def create_user(request):

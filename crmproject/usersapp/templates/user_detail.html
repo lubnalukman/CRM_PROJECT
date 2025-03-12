@@ -15,7 +15,7 @@
         </div>
         <div class="mt-6">
             <a href="{% url 'edit_user' user.id %}" class="bg-blue-500 text-white px-4 py-2 rounded">Edit User</a>
-            <a href="{% url 'admin_dashboard' %}" class="bg-gray-500 text-white px-4 py-2 rounded ml-2">Back to Dashboard</a>
+            <a href="{% url 'delete_user' user.id %}" class="text-red-500 hover:underline ml-2">Delete</a>
         </div>
     </div>
 {% endblock %}

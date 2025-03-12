@@ -15,24 +15,25 @@
                         <th class="px-4 py-2">User Type</th>
                         <th class="px-4 py-2">Phone Number</th>
                         <th class="px-4 py-2">Verified</th>
-                        <th class="px-4 py-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for user in users %}
+                    {% for user in page_obj %}
                     <tr class="border-b">
-                        <td class="px-4 py-2">{{ user.username }}</td>
+                        <!-- Make the Username clickable to redirect to the user_detail page -->
+                        <td class="px-4 py-2">
+                            <a href="{% url 'user_detail' user.id %}" class="text-blue-500 hover:underline">{{ user.username }}</a>
+                        </td>
                         <td class="px-4 py-2">{{ user.first_name }}</td>
                         <td class="px-4 py-2">{{ user.last_name }}</td>
                         <td class="px-4 py-2">{{ user.email }}</td>
                         <td class="px-4 py-2">{{ user.user_type }}</td>
                         <td class="px-4 py-2">{{ user.phone_number }}</td>
                         <td class="px-4 py-2">{{ user.is_verified|yesno:"Yes,No" }}</td>
-                        <td class="px-4 py-2">
-                            <a href="{% url 'user_detail' user.id %}" class="text-green-500 hover:underline">View</a>
-                            <a href="{% url 'edit_user' user.id %}" class="text-blue-500 hover:underline ml-2">Edit</a>
-                            <a href="{% url 'delete_user' user.id %}" class="text-red-500 hover:underline ml-2">Delete</a>
-                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-4 py-2 text-center">No users found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -40,28 +41,24 @@
         </div>
     </div>
 
-        <!-- Pagination Controls -->
-        <div class="mt-6">
-            <div class="flex justify-between items-center">
-                <div>
-                    {% if page_obj.has_previous %}
-                        <a href="?page=1" class="bg-blue-500 text-white px-4 py-2 rounded">First</a>
-                        <a href="?page={{ page_obj.previous_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Previous</a>
-                    {% endif %}
-                </div>
-                <div>
-                    <span class="text-gray-700">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                </div>
-                <div>
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded">Next</a>
-                        <a href="?page={{ page_obj.paginator.num_pages }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Last</a>
-                    {% endif %}
-                </div>
+    <!-- Pagination Controls -->
+    <div class="mt-6">
+        <div class="flex justify-between items-center">
+            <div>
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="bg-blue-500 text-white px-4 py-2 rounded">First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Previous</a>
+                {% endif %}
+            </div>
+            <div>
+                <span class="text-gray-700">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </div>
+            <div>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Last</a>
+                {% endif %}
             </div>
         </div>
     </div>
-{% endblock %}
-
-
 {% endblock %}
