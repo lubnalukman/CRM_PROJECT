@@ -1,0 +1,82 @@
+{% include "navbar.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .btn-hover:hover {
+            background-color: #003366 !important; /* Dark Blue */
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>User Profile</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Profile Details (Initially Visible) -->
+        <div id="profile-details" class="card p-4 shadow">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>First Name:</strong> {{ user.first_name }}</p>
+            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+            <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+
+            <button class="btn btn-primary btn-hover" onclick="toggleEdit()">Edit Profile</button>
+        </div>
+
+        <!-- Edit Form (Hidden Initially) -->
+        <form id="edit-form" method="post" class="card p-4 shadow" style="display: none;">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label" for="id_username">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="id_email">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="id_first_name">First Name</label>
+                {{ form.first_name }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="id_last_name">Last Name</label>
+                {{ form.last_name }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="id_phone_number">Phone Number</label>
+                {{ form.phone_number }}
+            </div>
+            <button type="submit" class="btn btn-success btn-hover">Save Changes</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleEdit() {
+            let profileDetails = document.getElementById('profile-details');
+            let editForm = document.getElementById('edit-form');
+
+            if (profileDetails.style.display === "none") {
+                profileDetails.style.display = "block";
+                editForm.style.display = "none";
+            } else {
+                profileDetails.style.display = "none";
+                editForm.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin CRM Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+       body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Ensure the container starts right below the navbar */
+.container {
+    flex: 1;
+    margin-top: 0 !important;
+    padding-top: 10px;
+}
+
+/* Bottom Navbar Fix */
+.bottom-navbar {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Ensure form moves right below bottom-navbar */
+.form-container {
+    max-width: 1600px;
+    margin: 20px auto 0; /* Move form down below navbar */
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect for buttons */
+.btn-hover:hover {
+    background-color: #003366 !important; /* Dark Blue */
+    color: white !important;
+}
+
+/* Styling inputs & form elements */
+form input, form select, form textarea {
+    font-size: 14px;
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Button styles */
+.btn-primary {
+    font-size: 14px;
+    padding: 8px 16px;
+    
+}
+
+/* Form Labels */
+form label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Top Bar Styling */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 10px 20px;
+    color: black;
+}
+
+/* Logo Styling */
+.topbar .logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* Search Bar */
+.topbar .search-bar {
+    width: 40%;
+}
+
+/* Icons & Profile Styling */
+.topbar .icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Content Wrapper */
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Navbar Link Hover Effect */
+.bottom-navbar .nav-link {
+    color:black !important;
+}
+
+.bottom-navbar .nav-link:hover {
+    text-decoration: underline;
+}
+.dropdown-menu {
+    z-index: 1050 !important; /* Ensure the dropdown appears above other elements */
+    position: absolute !important; /* Prevents it from being affected by parent elements */
+}
+    </style>
+</head>
+<body>
+
+   <!-- Top Navbar -->
+   <div class="topbar">
+    <div class="logo">ABC Company CRM</div>
+    
+    <div class="icons">
+         <input type="text" class="form-control search-bar" placeholder="Search...">
+       
+        <button class="btn btn-dark btn-sm">
+            <i class="bi bi-bell text-white"></i>
+        </button>
+
+        <div class="dropdown ms-3">
+            <img src="https://via.placeholder.com/40" alt="Admin" class="profile-pic dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown">
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navbar (Moved Below Topbar) -->
+<nav class="bottom-navbar navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+        <ul class="navbar-nav mx-auto gap-4"> <!-- Added gap for spacing -->
+            <li class="nav-item">
+                <a class="nav-link me-4" href="{% url 'admin_dashboard' %}">Dashboard</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle me-4" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
+                    Leads
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'all_leads' %}">All Leads</a></li>
+                    <li><a class="dropdown-item" href="{% url 'create_lead' %}">Create Lead</a></li>
+                    <li><a class="dropdown-item" href="{% url 'create_lead_source' %}">Create Lead Source</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle me-4" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
+                    Clients
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">All Clients</a></li>
+                    <li><a class="dropdown-item" href="#">Add Client</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle me-4" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
+                    Users
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'all_users' %}">All Users</a></li>
+                    <li><a class="dropdown-item" href="{% url 'create_user' %}">Add User</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link me-4" href="#">Sales</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link me-4" href="#">Reports</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link me-4" href="#">Notifications</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle me-4" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
+                    Settings
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'reset_password' %}">Reset Password</a></li>
+                    <li><a class="dropdown-item" href="#">Permissions</a></li>
+                    <li><a class="dropdown-item" href="{% url 'user_profile' %}">Edit Profile</a></li>
+                    
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+</body>

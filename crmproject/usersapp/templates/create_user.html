@@ -1,6 +1,15 @@
-{% extends 'base.html' %}
+{% include 'navbar.html' %}
 
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
     <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
         <h2 class="text-xl font-semibold mb-4">Create New User</h2>
         <form method="post">
@@ -9,4 +18,5 @@
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Create User</button>
         </form>
     </div>
-{% endblock %}
+</body>
+</html>

@@ -57,7 +57,7 @@ def create_lead(request):
             source_id = request.POST.get('source')
             if source_id:
                 try:
-                    lead.source = LeadSource.objects.get(id=source_id)  # Assign LeadSource object
+                    lead.sources = LeadSource.objects.get(id=source_id)  # Assign LeadSource object
                 except LeadSource.DoesNotExist:
                     messages.error(request, "Invalid source selected.")
                     return redirect('create_lead')
@@ -81,7 +81,7 @@ def create_lead(request):
     users = User.objects.all()  # Fetch all users for the dropdown
     lead_sources = LeadSource.objects.all()  # Fetch LeadSource options for dropdown
 
-    return render(request, 'create_lead.html', {'form': form, 'users': users})
+    return render(request, 'create_lead.html', {'form': form, 'users': users,'lead_sources': lead_sources })
 
 @login_required
 def edit_lead(request, lead_id):

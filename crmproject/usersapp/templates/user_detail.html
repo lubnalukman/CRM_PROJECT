@@ -1,6 +1,15 @@
-{% extends 'base.html' %}
 
-{% block content %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
     <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
         <h2 class="text-xl font-semibold mb-4">User Details</h2>
         <div class="space-y-4">
@@ -14,8 +23,9 @@
             <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
         </div>
         <div class="mt-6">
-            <a href="{% url 'edit_user' user.id %}" class="bg-blue-500 text-white px-4 py-2 rounded">Edit User</a>
+            <a href="{% url 'edit_user' user.id %}" class="bg-blue-500 text-black px-4 py-2 rounded">Edit User</a>
             <a href="{% url 'delete_user' user.id %}" class="text-red-500 hover:underline ml-2">Delete</a>
         </div>
     </div>
-{% endblock %}
+</body>
+</html>

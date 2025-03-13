@@ -11,12 +11,10 @@ from django.core.mail import send_mail
 from .forms import SignupForm
 from leadsapp.models import Lead, LeadSource
 from django.contrib.auth.decorators import login_required
-from usersapp.forms import UserForm
+from usersapp.forms import UserForm,UserProfileForm
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model 
 from django.contrib.auth.forms import AuthenticationForm
-
-
 
 def index(request):
     return render(request,"index.html")
@@ -109,6 +107,22 @@ def custom_login(request):
         # GET request - show empty login form
         form = AuthenticationForm()
         return render(request, 'registration/login.html', {'form': form})
+    
+@login_required
+def user_profile(request):
+    user = request.user  # Get the logged-in user
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('user_profile')
+        else:
+            messages.error(request, "Error updating profile. Please check the form.")
+    else:
+        form = UserProfileForm(instance=user)  # Prefill form with user data
+
+    return render(request, 'user_profile.html', {'form': form})
 
 def admin_dashboard(request):
     if not request.user.is_authenticated:

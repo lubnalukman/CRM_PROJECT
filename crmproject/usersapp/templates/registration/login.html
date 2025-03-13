@@ -69,6 +69,27 @@ h2 {
     color: red;
     margin-bottom: 15px;
 }
+.forgot-password {
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+.forgot-password a {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+.forgot-password {
+    display: block !important;
+    visibility: visible !important;
+    color: red;
+    font-size: 18px;
+    font-weight: bold;
+}
 
 /* Link Styling */
 
@@ -89,10 +110,11 @@ h2 {
             </div>
             <div class="input-group">
                 <label for="id_password">Password:</label>
-                {{ form.password }}
+                <input type="password" name="password" id="id_password" required>
             </div>
             <button type="submit" class="login-btn">Login</button>
         </form>
     </div>
+   
 </body>
 </html>
