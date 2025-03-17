@@ -11,16 +11,19 @@ from django.core.mail import send_mail
 from .forms import SignupForm
 from leadsapp.models import Lead, LeadSource
 from django.contrib.auth.decorators import login_required
-from usersapp.forms import UserForm,UserProfileForm
+from usersapp.forms import UserForm,UserProfileForm, UserEditForm
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model 
 from django.contrib.auth.forms import AuthenticationForm
+import logging
+
 
 def index(request):
     return render(request,"index.html")
 
 User = get_user_model()
 
+logger = logging.getLogger(__name__)
 
 def signup_user(request):
     if request.method == 'POST':
@@ -31,9 +34,6 @@ def signup_user(request):
             user.user_type = 'viewer'  # Assign default user type
             user.save()
 
-            # Log the user in after successful signup
-            #login(request, user)
-
             try:
                 # Fetch an existing LeadSource with 'web_form', or create if none exists
                 lead_source = LeadSource.objects.filter(source='web_form').first()
@@ -43,13 +43,13 @@ def signup_user(request):
                         source='web_form',
                         description='Leads from web form signups'
                     )
-
+                
                 # Create the lead with user details
                 lead = Lead.objects.create(
                     first_name=user.first_name,
                     last_name=user.last_name,
                     email=user.email,
-                    phone_number='',  # Empty string instead of None
+                    phone_number = form.cleaned_data.get('phone_number', ''),
                     source=lead_source,  # Assign the LeadSource instance
                     status='new',  # Default status
                     assigned_to=None,  # No assigned user by default
@@ -58,10 +58,11 @@ def signup_user(request):
                 )
 
                 # Redirect after successful signup
+                messages.success(request, "Signup successful! Please log in.")
                 return redirect('custom_login')  # Change to your actual dashboard URL
 
             except Exception as e:
-                print(f"Error creating lead: {e}")  # Log the error
+                logger.error(f"Error creating lead: {e}") # Log the error
                 user.delete()  # Rollback user creation if lead creation fails
                 form.add_error(None, "An error occurred while creating the lead. Please try again.")
 
@@ -171,11 +172,19 @@ def create_user(request):
     
     if request.method == 'POST':
         form = UserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('admin_dashboard')
+        password1 = request.POST.get('password1')  # Get the first password
+        password2 = request.POST.get('password2')  # Get the second password (confirmation)
+
+        if password1 != password2:
+            form.add_error('password', 'Passwords do not match.')  # Add error if passwords do not match
+        elif form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(password1)  # Set the password
+            user.save()  # Save the user object
+            return redirect('all_users')
     else:
         form = UserForm()
+    
     return render(request, 'create_user.html', {'form': form})
 
 
@@ -186,12 +195,12 @@ def edit_user(request, user_id):
     
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
-        form = UserForm(request.POST, instance=user)
+        form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('admin_dashboard')
+            return redirect('all_users')
     else:
-        form = UserForm(instance=user)
+        form = UserEditForm(instance=user)
     return render(request, 'edit_user.html', {'form': form})
 
 @login_required
@@ -201,7 +210,7 @@ def delete_user(request, user_id):
     
     user = get_object_or_404(User, id=user_id)
     user.delete()
-    return redirect('admin_dashboard')
+    return redirect('all_users')
 
 @login_required
 def user_detail(request, user_id):
@@ -237,7 +246,7 @@ def reset_password(request):
             del request.session['otp']
             del request.session['email']
             messages.success(request, 'Your password has been successfully reset.')
-            return redirect('login')
+            return redirect('custom_login')
         else:
             # Passwords do not match
             messages.error(request, 'Passwords do not match. Please try again.')

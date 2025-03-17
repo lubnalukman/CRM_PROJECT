@@ -90,7 +90,7 @@ def edit_lead(request, lead_id):
         form = LeadForm(request.POST, instance=lead)
         if form.is_valid():
             form.save()
-            return redirect('admin_dashboard')
+            return redirect('all_leads')
     else:
         form = LeadForm(instance=lead)
     return render(request, 'edit_lead.html', {'form': form})

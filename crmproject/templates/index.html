@@ -59,10 +59,10 @@
        <div class="container-fluid">
            <ul class="navbar-nav mx-auto gap-4">
                <li class="nav-item">
-                   <a class="nav-link me-4" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+                   <a class="nav-link me-4" href="{% url 'custom_login' %}">Login</a>
                </li>
                <li class="nav-item">
-                   <a class="nav-link me-4" href="#" data-bs-toggle="modal" data-bs-target="#signupModal">SignUp</a>
+                   <a class="nav-link me-4" href="{% url 'signup' %}">SignUp</a>
                </li>
                <li class="nav-item">
                    <a class="nav-link me-4" href="#">About Us</a>
@@ -73,79 +73,6 @@
            </ul>
        </div>
    </nav>
-   <!-- Login Modal -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content p-3">
-            <div class="modal-header">
-                <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post" action="{% url 'custom_login' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="loginUsername" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="loginUsername" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="loginPassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="loginPassword" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-success w-100">Login</button>
-                </form>
-
-                <div class="text-center mt-3">
-                    <p class="mb-2">Don't have an account?</p>
-                    <a href="#" class="btn btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#signupModal">Signup</a>
-                </div>
-
-                <div class="text-center mt-3">
-                    <a href="{% url 'request_otp' %}" class="text-decoration-none">Forgot your password?</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-   
-   <!-- Signup Modal -->
-   <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
-       <div class="modal-dialog">
-           <div class="modal-content">
-               <div class="modal-header">
-                   <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
-                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-               </div>
-               <div class="modal-body">
-                   <form method="post" action="{% url 'signup' %}">
-                       {% csrf_token %}
-                       <div class="mb-3">
-                           <label for="signupUsername" class="form-label">Username</label>
-                           <input type="text" class="form-control" id="signupUsername" name="username" required>
-                       </div>
-                       <div class="mb-3">
-                           <label for="signupEmail" class="form-label">Email</label>
-                           <input type="email" class="form-control" id="signupEmail" name="email" required>
-                       </div>
-                       <div class="mb-3">
-                           <label for="signupPassword1" class="form-label">Password</label>
-                           <input type="password" class="form-control" id="signupPassword1" name="password1" required>
-                       </div>
-                       <div class="mb-3">
-                           <label for="signupPassword2" class="form-label">Confirm Password</label>
-                           <input type="password" class="form-control" id="signupPassword2" name="password2" required>
-                       </div>
-                       <button type="submit" class="btn btn-success w-100">Sign Up</button>
-                   </form>
-                   <div class="text-center mt-3">
-                    <p class="mb-2">Already have an account?</p>
-                    <a href="#" class="btn btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
-                </div>
-               </div>
-           </div>
-       </div>
-   </div>
 
 </body>
 </html>
