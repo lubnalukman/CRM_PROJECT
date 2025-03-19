@@ -199,9 +199,13 @@ def edit_user(request, user_id):
         if form.is_valid():
             form.save()
             return redirect('all_users')
+        else:
+            # Print form errors for debugging
+            print(form.errors)
     else:
         form = UserEditForm(instance=user)
     return render(request, 'edit_user.html', {'form': form})
+
 
 @login_required
 def delete_user(request, user_id):

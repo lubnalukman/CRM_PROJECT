@@ -54,22 +54,22 @@ def create_lead(request):
         if form.is_valid():
             lead = form.save(commit=False)  # Don't save yet
 
+            # ✅ Assign Lead Source
             source_id = request.POST.get('source')
             if source_id:
                 try:
-                    lead.sources = LeadSource.objects.get(id=source_id)  # Assign LeadSource object
+                    lead.source = LeadSource.objects.get(id=source_id)  # Assign LeadSource
                 except LeadSource.DoesNotExist:
                     messages.error(request, "Invalid source selected.")
                     return redirect('create_lead')
 
-            assigned_user_id = request.POST.get('assigned_to')
-            if assigned_user_id:
-                try:
-                    lead.assigned_to = User.objects.get(id=assigned_user_id)  # Assign user
-                except User.DoesNotExist:
-                    messages.error(request, "Invalid assigned user.")
-                    return redirect('create_lead')
-            lead.save()  # Now save the lead
+            lead.save()  # ✅ Save Lead before assigning ManyToMany field
+
+            # ✅ Assign Multiple Users to `assigned_to`
+            assigned_user_ids = request.POST.getlist('assigned_to')  # Get multiple selected users
+            users = User.objects.filter(id__in=assigned_user_ids)  # Fetch users from DB
+            lead.assigned_to.set(users)  # ✅ Assign multiple users
+
             messages.success(request, "Lead created successfully!")
             return redirect('all_leads')
         else:
@@ -78,22 +78,30 @@ def create_lead(request):
     else:
         form = LeadForm()
 
-    users = User.objects.all()  # Fetch all users for the dropdown
-    lead_sources = LeadSource.objects.all()  # Fetch LeadSource options for dropdown
+    users = User.objects.all()  # Fetch all users for selection
+    lead_sources = LeadSource.objects.all()  # Fetch LeadSource options
 
-    return render(request, 'create_lead.html', {'form': form, 'users': users,'lead_sources': lead_sources })
+    return render(request, 'create_lead.html', {'form': form, 'users': users, 'lead_sources': lead_sources})
 
 @login_required
 def edit_lead(request, lead_id):
-    lead = get_object_or_404(Lead, id=lead_id)
-    if request.method == 'POST':
-        form = LeadForm(request.POST, instance=lead)
+    lead = get_object_or_404(Lead, id=lead_id)  # Get the specific lead
+    users = User.objects.filter(user_type__in=['Sales Manager', 'Sales Representative'])
+
+    if request.method == "POST":
+        form = LeadForm(request.POST, instance=lead)  # Bind form to the instance
         if form.is_valid():
             form.save()
-            return redirect('all_leads')
+            return redirect("lead_detail", lead_id=lead.id)
     else:
-        form = LeadForm(instance=lead)
-    return render(request, 'edit_lead.html', {'form': form})
+        form = LeadForm(instance=lead)  # Populate form with existing data
+    context = {
+        'form': form,
+        'lead': lead,
+        'users': users,  # Pass users to template excluding Admin
+    }
+    return render(request, "edit_lead.html", context)
+
 
 @login_required
 def delete_lead(request, lead_id):
@@ -126,3 +134,21 @@ def create_lead_source(request):
     else:
         form = LeadSourceForm
     return render(request, "create_lead_source.html", {"form": form})
+
+@login_required
+def edit_lead_source(request,source_id):
+    source = get_object_or_404(LeadSource, id=source_id)
+    if request.method == 'POST':
+        form = LeadSourceForm(request.POST, instance=source)
+        if form.is_valid():
+            form.save()
+            return redirect('lead_source')
+    else:
+        form = LeadSourceForm(instance=source)
+    return render(request, 'edit_leadsource.html', {'form': form,'source':source})
+
+@login_required
+def delete_lead_source(request, source_id):
+    source = get_object_or_404(LeadSource, id=source_id)
+    source.delete()
+    return redirect('lead_source')

@@ -1,59 +1,70 @@
-{% include 'navbar.html' %}
+{% include 'admin_base.html' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>User Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">All Users</h2>
-        <a href="{% url 'create_user' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New User</a>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6">
+        <!-- Page Title -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-700">All Users</h2>
+            <a href="{% url 'create_user' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-md transition">
+                + Create New User
+            </a>
+        </div>
+
+        <!-- Table Container -->
         <div class="overflow-x-auto">
-            <table class="min-w-full">
-                <thead class="bg-gray-200">
+            <table class="min-w-full bg-white shadow-md rounded-lg">
+                <thead class="bg-gray-200 text-gray-700 uppercase text-sm">
                     <tr>
-                        <th class="px-4 py-2">Username</th>
-                        <th class="px-4 py-2">First Name</th>
-                        <th class="px-4 py-2">Last Name</th>
-                        <th class="px-4 py-2">Email</th>
-                        <th class="px-4 py-2">User Type</th>
-                        <th class="px-4 py-2">Phone Number</th>
-                        <th class="px-4 py-2">Verified</th>
+                        <th class="px-4 py-3 text-left">Username</th>
+                        <th class="px-4 py-3 text-left">First Name</th>
+                        <th class="px-4 py-3 text-left">Last Name</th>
+                        <th class="px-4 py-3 text-left">Email</th>
+                        <th class="px-4 py-3 text-left">User Type</th>
+                        <th class="px-4 py-3 text-left">Phone Number</th>
+                        <th class="px-4 py-3 text-left">Verified</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-gray-300">
                     {% for user in page_obj %}
-                    <tr class="border-b">
-                        <!-- Make the Username clickable to redirect to the user_detail page -->
-                        <td class="px-4 py-2">
-                            <a href="{% url 'user_detail' user.id %}" class="text-blue-500 hover:underline">{{ user.username }}</a>
+                    <tr class="hover:bg-gray-100 transition">
+                        <td class="px-4 py-3">
+                            <a href="{% url 'user_detail' user.id %}" class="text-blue-600 hover:underline">
+                                {{ user.username }}
+                            </a>
                         </td>
-                        <td class="px-4 py-2">{{ user.first_name }}</td>
-                        <td class="px-4 py-2">{{ user.last_name }}</td>
-                        <td class="px-4 py-2">{{ user.email }}</td>
-                        <td class="px-4 py-2">{{ user.user_type }}</td>
-                        <td class="px-4 py-2">{{ user.phone_number }}</td>
-                        <td class="px-4 py-2">{{ user.is_verified|yesno:"Yes,No" }}</td>
+                        <td class="px-4 py-3">{{ user.first_name }}</td>
+                        <td class="px-4 py-3">{{ user.last_name }}</td>
+                        <td class="px-4 py-3">{{ user.email }}</td>
+                        <td class="px-4 py-3">{{ user.user_type }}</td>
+                        <td class="px-4 py-3">{{ user.phone_number }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-sm font-semibold rounded {% if user.is_verified %} bg-green-100 text-green-700 {% else %} bg-red-100 text-red-700 {% endif %}">
+                                {{ user.is_verified|yesno:"Yes,No" }}
+                            </span>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="px-4 py-2 text-center">No users found.</td>
+                        <td colspan="7" class="px-4 py-3 text-center text-gray-500">No users found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- Pagination Controls -->
-    <div class="mt-6">
-        <div class="flex justify-between items-center">
+        <!-- Pagination Controls -->
+        <div class="mt-6 flex justify-between items-center">
             <div>
                 {% if page_obj.has_previous %}
-                    <a href="?page=1" class="bg-blue-500 text-white px-4 py-2 rounded">First</a>
-                    <a href="?page={{ page_obj.previous_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Previous</a>
+                    <a href="?page=1" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition">First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition ml-2">Previous</a>
                 {% endif %}
             </div>
             <div>
@@ -61,13 +72,11 @@
             </div>
             <div>
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" class="bg-blue-500 text-white px-4 py-2 rounded">Next</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}" class="bg-blue-500 text-white px-4 py-2 rounded ml-2">Last</a>
+                    <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition ml-2">Last</a>
                 {% endif %}
             </div>
         </div>
     </div>
 </body>
 </html>
-
-

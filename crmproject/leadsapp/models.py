@@ -33,7 +33,11 @@ class Lead(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
     tags = models.CharField(max_length=100, blank=True, null=True)  # For categorization
     notes = models.TextField(blank=True, null=True)  # No default notes
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_leads')
+    assigned_to = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='assigned_leads',
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

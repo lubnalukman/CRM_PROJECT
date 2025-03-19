@@ -1,30 +1,77 @@
-{% include 'navbar.html' %}
+{% include 'admin_base.html' %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-    <title>title</title>
-  </head>
-  <body>
-    <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
-        <h2 class="text-xl font-semibold mb-4">Lead Details</h2>
-        <div class="space-y-4">
-            <p><strong>Name:</strong> {{ lead.first_name }} {{ lead.last_name }}</p>
-            <p><strong>Email:</strong> {{ lead.email }}</p>
-            <p><strong>Phone Number:</strong> {{ lead.phone_number }}</p>
-            <p><strong>Source:</strong> {{ lead.source.source }}</p>
-            <p><strong>Status:</strong> {{ lead.status }}</p>
-            <p><strong>Tags:</strong> {{ lead.tags }}</p>
-            <p><strong>Notes:</strong> {{ lead.notes }}</p>
-            <p><strong>Assigned To:</strong> {{ lead.assigned_to.username }}</p>
-            <p><strong>Created At:</strong> {{ lead.created_at }}</p>
-            <p><strong>Updated At:</strong> {{ lead.updated_at }}</p>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="flex items-center justify-center min-h-screen bg-gray-100 -mt-12">
+    <div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl w-full mx-4">
+        <!-- Title -->
+        <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4 text-center">Lead Details</h2>
+        <!-- Lead Information -->
+        <div class="space-y-10">
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Name:</span>
+                <span class="text-gray-800">{{ lead.first_name }} {{ lead.last_name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Email:</span>
+                <span class="text-gray-800">{{ lead.email }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Phone Number:</span>
+                <span class="text-gray-800">{{ lead.phone_number }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Source:</span>
+                <span class="text-gray-800">{{ lead.source.source }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Status:</span>
+                <span class="px-3 py-1 text-sm font-semibold rounded {% if lead.status == 'Active' %} bg-green-100 text-green-700 {% else %} bg-red-100 text-red-700 {% endif %}">
+                    {{ lead.status }}
+                </span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Tags:</span>
+                <span class="text-gray-800">{{ lead.tags }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Notes:</span>
+                <span class="text-gray-800">{{ lead.notes }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Assigned To:</span>
+                {% for user in lead.assigned_to.all %}
+                <span class="text-gray-800">{{ user.username }}</span>
+                {% empty %}
+                <span class="text-gray-800">No users assigned</span>
+                {% endfor %}
+            </div> 
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Created At:</span>
+                <span class="text-gray-800">{{ lead.created_at }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-600">Updated At:</span>
+                <span class="text-gray-800">{{ lead.updated_at }}</span>
+            </div>
         </div>
-        <div class="mt-6">
-            <a href="{% url 'edit_lead' lead.id %}" class="bg-blue-500 text-black px-4 py-2 rounded">Edit Lead</a>
-            <a href="{% url 'delete_lead' lead.id %}" class="text-red-500 hover:underline ml-2">Delete</a>
-            
+
+        <!-- Action Buttons -->
+        <div class="mt-6 flex justify-end space-x-3">
+            <a href="{% url 'edit_lead' lead.id %}" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition">
+                Edit Lead
+            </a>
+            <a href="{% url 'delete_lead' lead.id %}" class="text-red-600 hover:underline font-semibold">
+                Delete
+            </a>
         </div>
     </div>
+  </div>
 </body>
 </html>

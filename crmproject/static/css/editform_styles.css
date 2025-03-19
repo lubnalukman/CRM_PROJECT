@@ -1,0 +1,67 @@
+/* Custom styles for the edit lead form */
+#edit-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    gap: 5px;
+}
+
+/* Style the form labels */
+#edit-form .form-label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* Style the input fields */
+#edit-form .form-control {
+    border: 2px solid #ccc;
+    padding: 12px;
+    border-radius: 5px;
+}
+
+/* Style the select fields */
+#edit-form .form-select {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Style the buttons */
+#edit-form button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+#edit-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Custom style for the cancel button */
+#edit-form .btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+#edit-form .btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    border-color: #6c757d;
+    color: #495057;
+}
+
+/* Make checkboxes inline */
+.d-flex.flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Adjust spacing */
+}
+
+/* Adjust checkbox size */
+.form-check-input {
+    transform: scale(1.1); /* Slightly larger checkboxes */
+    margin-right: 5px;
+}

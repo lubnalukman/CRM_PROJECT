@@ -1,0 +1,28 @@
+{% include 'admin_base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Edit Lead Source</title>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="text-center">Edit Lead Source</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <label>Source</label>
+        {{ form.source }}
+        
+        <label>Description</label>
+        {{ form.description }}
+        
+        <button type="submit" class="btn btn-primary mt-3">Update</button>
+        <a href="{% url 'lead_source' %}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+
+</body>
+</html>

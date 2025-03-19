@@ -1,4 +1,4 @@
-{% include 'navbar.html' %}
+{% include 'admin_base.html' %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -46,7 +46,13 @@ tbody tr:hover {
     background-color: #f9f9f9;
     transition: background 0.3s ease-in-out;
 }
-
+h2{
+         margin-left: 400px;
+        display: flex;
+       
+        margin-bottom: 30px;
+        flex-wrap: wrap; 
+}
 /* Badge Styling for Status */
 .status-badge {
     padding: 6px 10px;
@@ -67,26 +73,47 @@ tbody tr:hover {
 
 .status-other {background-color: #126fc0; /* Gray */
 }
-  
+.action-buttons {
+        display: flex;
+        margin-left: 1100px;/* Align buttons to the left */
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .action-buttons a {
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        background-color: #4CAF50; /* Primary green color */
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 5px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        text-align: center;
+      }
+
+      .action-buttons a:hover {
+        background-color: #45a049; /* Darker green on hover */
+        transform: translateY(-2px); /* Slight lift effect on hover */
+      }
+
+      .action-buttons a:active {
+        transform: translateY(1px); /* Pressed effect */
+      }
     
     </style>
   </head>
   <body>
     <div class="flex justify-center mt-10">
         <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-6xl">
-            <!-- Create Lead Button -->
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-semibold text-gray-700">All Leads</h2>
-                <a href="{% url 'create_lead' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
-                    + Create Lead
-                </a>
-                <a href="{% url 'create_lead_source' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
-                    + Create Lead Source
-                </a>
-                <a href="{% url 'lead_source' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
-                    View Lead Source
-                </a>
-            </div>
+            <h2><a href="{% url 'admin_dashboard' %}">←</a>  All Leads</h2>
+            <div class="action-buttons">
+                    <a href="{% url 'create_lead' %}">+ Create Lead</a>
+                    <a href="{% url 'create_lead_source' %}">+ Create Lead Source</a>
+                    <a href="{% url 'lead_source' %}">View Lead Source</a>
+            </div>   
 
             <!-- Table Container -->
             <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-md">
@@ -116,7 +143,14 @@ tbody tr:hover {
                                     {{ lead.get_status_display }}
                                 </span>
                             </td>
-                            <td class="py-3 px-6">{{ lead.assigned_to.username }}</td>
+                            <td class="py-3 px-6">
+                                <span class="font-semibold text-gray-600">Assigned To:</span>
+                                 {% for user in lead.assigned_to.all %}
+                                 <span class="text-gray-800">{{ user.username }}</span>
+                                 {% empty %}
+                                 <span class="text-gray-800">No users assigned</span>
+                                {% endfor %} 
+                            </td>
                             <td class="py-3 px-6">
                                 <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">{{ lead.tags }}</span>
                             </td>

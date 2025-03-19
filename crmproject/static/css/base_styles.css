@@ -1,0 +1,121 @@
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Ensure the container starts right below the navbar */
+.container {
+    flex: 1;
+    margin-top: 0 !important;
+    padding-top: 10px;
+}
+
+/* Bottom Navbar Fix */
+.bottom-navbar {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Ensure form moves right below bottom-navbar */
+.form-container {
+    max-width: 1600px;
+    margin: 20px auto 0; /* Move form down below navbar */
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect for buttons */
+.btn-hover:hover {
+    background-color: #003366 !important; /* Dark Blue */
+    color: white !important;
+}
+
+/* Styling inputs & form elements */
+form input, form select, form textarea {
+    font-size: 14px;
+    padding: 8px;
+    width: 50%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Button styles */
+.btn-primary {
+    font-size: 14px;
+    padding: 8px 16px;
+    
+}
+
+/* Form Labels */
+form label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Top Bar Styling */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 10px 20px;
+    color: black;
+}
+
+/* Logo Styling */
+.topbar .logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* Search Bar */
+.topbar .search-bar {
+    width: 40%;
+}
+
+/* Icons & Profile Styling */
+.topbar .icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Content Wrapper */
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Navbar Link Hover Effect */
+.bottom-navbar .nav-link {
+    color:black !important;
+}
+
+.bottom-navbar .nav-link:hover {
+    text-decoration: underline;
+}
+.dropdown-menu {
+    z-index: 1050 !important; /* Ensure the dropdown appears above other elements */
+    position: absolute !important; /* Prevents it from being affected by parent elements */
+}

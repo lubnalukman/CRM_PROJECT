@@ -1,25 +1,24 @@
-{% include 'navbar.html' %}
+{% include 'admin_base.html' %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>title</title>
+    <title>Create Lead SOurce</title>
   </head>
   <body> 
-<div class="flex justify-center mt-10">
-    <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
-        <h2 class="text-xl font-semibold text-center mb-4">Add Lead Source</h2>
 
-        <form method="post" class="space-y-4">
+    <div class="container mt-5">
+        <h2 class="text-center">Create Lead Source</h2>
+        <form method="post" class="space-y-2">
             {% csrf_token %}
             
             <div>
-                <label class="block text-gray-700">Source</label>
+                <label class="block text-gray-400">Source</label>
                 {{ form.source }}
             </div>
 
             <div>
-                <label class="block text-gray-700">Description</label>
+                <label class="block text-gray-400">Description</label>
                 {{ form.description }}
             </div>
 

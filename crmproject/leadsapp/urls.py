@@ -12,7 +12,8 @@ urlpatterns = [
     path('lead_details/<int:lead_id>/', views.lead_detail, name='lead_detail'),
     path('lead_source_list',views.lead_source_list,name='lead_source'),
     path('create_lead_source/', views.create_lead_source, name='create_lead_source'),
-   
+    path('lead-source/edit/<int:source_id>/', views.edit_lead_source, name='edit_lead_source'),
+    path('lead-source/delete/<int:source_id>/', views.delete_lead_source, name='delete_lead_source'),
 
    
 ]

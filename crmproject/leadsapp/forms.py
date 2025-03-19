@@ -9,12 +9,11 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class LeadForm(forms.ModelForm):
-    assigned_to = forms.ModelChoiceField(
-        queryset=User.objects.all(),  # Populate with users
-        widget=forms.Select(attrs={'class': 'form-select'}),
+    assigned_to = forms.ModelMultipleChoiceField(
+        queryset=User.objects.filter(user_type__in=["sales_manager", "sales_rep"]),
+        widget=forms.CheckboxSelectMultiple,  # Allows multiple selection
         required=False
     )
-
     class Meta:
         model = Lead
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'source', 'status', 'tags', 'notes', 'assigned_to']
