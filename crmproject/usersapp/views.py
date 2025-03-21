@@ -117,6 +117,14 @@ def user_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully!")
+            if user.user_type == "admin":
+                return redirect('admin_dashboard')
+            elif user.user_type == "sales_manager":
+                return redirect('manager_dashboard')
+            elif user.user_type == "sales_rep":
+                return redirect('salesrep_dashboard')
+            elif user.user_type == "viewer":
+                return redirect('viewer_dashboard')
             return redirect('user_profile')
         else:
             messages.error(request, "Error updating profile. Please check the form.")
@@ -125,30 +133,27 @@ def user_profile(request):
 
     return render(request, 'user_profile.html', {'form': form})
 
+@login_required
 def admin_dashboard(request):
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
     if request.user.user_type != 'admin':
         return redirect('custom_login')  # Or some unauthorized page
     return render(request, 'admin_dashboard.html')
 
+@login_required
 def manager_dashboard(request):
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
     if request.user.user_type != 'sales_manager':
-        return redirect('custom_login')
+        return redirect('custom_login')  # Redirect if not a Sales Manager
+
     return render(request, 'salesmanager_dashboard.html')
 
+@login_required
 def salesrep_dashboard(request):
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
     if request.user.user_type != 'sales_rep':
         return redirect('custom_login')
     return render(request, 'salesrep_dashboard.html')
 
+@login_required
 def viewer_dashboard(request):
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
     if request.user.user_type != 'viewer':
         return redirect('custom_login')
     return render(request, 'viewer_dashboard.html')
@@ -156,20 +161,26 @@ def viewer_dashboard(request):
 
 @login_required
 def all_users(request):
-    # Fetch all users
-    users = User.objects.all()
-    paginator = Paginator(users, 10)  # 10 users per page
+    current_user = request.user
+
+    # Determine which users to show based on user type
+    if current_user.user_type == "admin":
+        users = User.objects.all()
+    elif current_user.user_type == "sales_manager":
+        users = User.objects.filter(user_type="sales_rep")
+    else:
+        users = User.objects.none()  # No users visible to Sales Reps or other roles
+
+    # Paginate the results
+    paginator = Paginator(users, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Render the template with the paginated users
+
     return render(request, 'all_users.html', {'page_obj': page_obj})
 
 @login_required
 def create_user(request):
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
-    
     if request.method == 'POST':
         form = UserForm(request.POST)
         password1 = request.POST.get('password1')  # Get the first password
@@ -190,42 +201,55 @@ def create_user(request):
 
 @login_required
 def edit_user(request, user_id):
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
-    
-    user = get_object_or_404(User, id=user_id)
+    current_user = request.user
+
+    # Restrict access based on user type
+    if current_user.user_type == 'admin':
+        user = get_object_or_404(User, id=user_id)
+    else:
+        user = get_object_or_404(User, id=user_id, user_type='sales_rep')
+
     if request.method == 'POST':
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
             return redirect('all_users')
         else:
-            # Print form errors for debugging
-            print(form.errors)
+            print(form.errors)  # Debugging
     else:
         form = UserEditForm(instance=user)
-    return render(request, 'edit_user.html', {'form': form})
 
+    return render(request, 'edit_user.html', {'form': form})
 
 @login_required
 def delete_user(request, user_id):
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
+    current_user = request.user
+
+    # Admin can delete any user
+    if current_user.user_type == 'admin':
+        user = get_object_or_404(User, id=user_id)
+        user.delete()
+        messages.success(request, "User deleted successfully.")
     
-    user = get_object_or_404(User, id=user_id)
-    user.delete()
+    # Sales Manager can only delete Sales Representatives (Optional)
+    else:
+        user = get_object_or_404(User, id=user_id, user_type='sales_rep')
+        user.delete()
+        messages.success(request, "Sales Representative deleted successfully.")
+
     return redirect('all_users')
 
 @login_required
 def user_detail(request, user_id):
-    # Ensure the user is authenticated
-    if not request.user.is_authenticated:
-        return redirect('custom_login')
-    
-    # Fetch the user or return a 404 error
-    user = get_object_or_404(User, id=user_id)
-    
-    # Render the user detail template
+    current_user = request.user
+
+    # Admins can view all users
+    if current_user.user_type == 'admin':
+        user = get_object_or_404(User, id=user_id)
+    else:
+        # Sales Managers can only view Sales Representatives
+        user = get_object_or_404(User, id=user_id, user_type='sales_rep')
+
     return render(request, 'user_detail.html', {'user': user})
 
 def logout_user(request):

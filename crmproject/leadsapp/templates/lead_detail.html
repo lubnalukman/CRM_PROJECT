@@ -1,4 +1,4 @@
-{% include 'admin_base.html' %}
+{% include 'navbar.html' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +7,15 @@
     <title>Lead Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="flex items-center justify-center min-h-screen bg-gray-100 -mt-12">
-    <div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl w-full mx-4">
+<body class="bg-gray-100 p-6">  
+    <div class="relative mt-4 ml-6">
+        <button onclick="window.history.back()" class="btn btn-outline-secondary">
+            ← Go Back
+        </button>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl w-full mx-auto">
         <!-- Title -->
-        <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4 text-center">Lead Details</h2>
+        <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4 pt-0 text-center">Lead Details</h2>
         <!-- Lead Information -->
         <div class="space-y-10">
             <div class="flex justify-between">
@@ -60,18 +64,69 @@
                 <span class="font-semibold text-gray-600">Updated At:</span>
                 <span class="text-gray-800">{{ lead.updated_at }}</span>
             </div>
-        </div>
+        
+            <h3 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Communication History</h3>
 
-        <!-- Action Buttons -->
-        <div class="mt-6 flex justify-end space-x-3">
-            <a href="{% url 'edit_lead' lead.id %}" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition">
-                Edit Lead
-            </a>
-            <a href="{% url 'delete_lead' lead.id %}" class="text-red-600 hover:underline font-semibold">
-                Delete
-            </a>
+            {% if communications %}
+                <div class="space-y-10">
+                    {% for comm in communications %}
+                    
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Type:</span>
+                            <span class="text-gray-800">{{ comm.interaction_type }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Subject:</span>
+                            <span class="text-gray-800">{{ comm.subject|default:"-" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Notes:</span>
+                            <span class="text-gray-800">{{ comm.notes|default:"-" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Created At:</span>
+                            <span class="text-gray-800">{{ comm.timestamp }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Created By:</span>
+                            <span class="text-gray-800">{{ comm.created_by.username|default:"-" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Updated At:</span>
+                            <span class="text-gray-800">{{ comm.updated_at }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Updated By:</span>
+                            <span class="text-gray-800">{{ comm.updated_by.username|default:"-" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-semibold text-gray-600">Attachment:</span>
+                            {% if comm.attachment %}
+                                <a href="{{ comm.attachment.url }}" class="text-blue-600 underline" target="_blank">Download</a>
+                            {% else %}
+                                <span class="text-gray-800">No Attachment</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+               
+            {% else %}
+                <p class="text-gray-600">No communications yet.</p>
+            {% endif %}
         </div>
+             <!-- Action Buttons -->
+             <div class="mt-6 flex justify-end space-x-3">
+                <a href="{% url 'edit_lead' lead.id %}" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition">
+                    Edit Lead
+                </a>
+                {% if user.user_type == "admin" or user.user_type == "sales_manager" %}
+                <a href="{% url 'delete_lead' lead.id %}" class="text-red-600 hover:underline font-semibold">
+                    Delete
+                </a>
+                {% endif %}
+            </div>
     </div>
-  </div>
+    
+  
 </body>
 </html>

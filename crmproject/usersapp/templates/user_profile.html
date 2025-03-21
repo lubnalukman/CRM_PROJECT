@@ -1,3 +1,4 @@
+{% include 'navbar.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -15,51 +16,11 @@
     </style>
 </head>
 <body>
-
-     <!-- Top Navbar -->
-   <div class="topbar">
-    <div class="logo">ABC Company CRM</div>
-    
-    <div class="icons">
-         <input type="text" class="form-control search-bar" placeholder="Search...">
-       
-        <button class="btn btn-dark btn-sm">
-            <i class="bi bi-bell text-white"></i>
+    <div class="relative mt-4 ml-6">
+        <button onclick="window.history.back()" class="btn btn-outline-secondary">
+            ← Go Back
         </button>
-
-        <div class="dropdown ms-3">
-            <img src="https://via.placeholder.com/40" alt="Admin" class="profile-pic dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown">
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
-                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-            </ul>
-        </div>
     </div>
-</div>
-
-<!-- Bottom Navbar (Moved Below Topbar) -->
-<nav class="bottom-navbar navbar navbar-expand-lg navbar-light">
-    <div class="container-fluid">
-        <ul class="navbar-nav mx-auto gap-4"> <!-- Added gap for spacing -->
-            <li class="nav-item">
-                <a class="nav-link me-4" href="{% url 'admin_dashboard' %}">Dashboard</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle me-4" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
-                    Settings
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{% url 'reset_password' %}">Reset Password</a></li>
-                    <li><a class="dropdown-item" href="#">Permissions</a></li>
-                    <li><a class="dropdown-item" href="{% url 'user_profile' %}">Edit Profile</a></li>   
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-            </li>
-        </ul>
-    </div>
-</nav>
 
     <div class="container mt-4">
         <h2>User Profile</h2>

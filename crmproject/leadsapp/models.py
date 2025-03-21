@@ -43,3 +43,29 @@ class Lead(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+class Communication(models.Model):
+    INTERACTION_TYPES = [
+        ('call', 'Call'),
+        ('email', 'Email'),
+        ('chat', 'Chat'),
+        ('meeting', 'Meeting'),
+    ]
+
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='communications')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='communications')
+    interaction_type = models.CharField(max_length=50, choices=INTERACTION_TYPES)
+    subject = models.CharField(max_length=255, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,related_name='updated_communications', blank=True, null=True)
+    attachment = models.FileField(upload_to='attachments/', blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['lead']),
+        ]
+
+    def __str__(self):
+        return f"{self.interaction_type} with {self.lead} on {self.timestamp.strftime('%Y-%m-%d')}"
