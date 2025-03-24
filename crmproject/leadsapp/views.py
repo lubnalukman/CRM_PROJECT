@@ -6,6 +6,8 @@ from .models import Lead, LeadSource, User,Communication
 from .forms import LeadForm,CommunicationForm
 from django.core.paginator import Paginator
 from .forms import LeadSourceForm
+from clientsapp.models import Client
+from django.utils import timezone
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import get_user_model 
@@ -96,6 +98,24 @@ def edit_lead(request, lead_id):
 
         if lead_form.is_valid():
             lead_form.save()
+
+             # Check if lead is converted and Client doesn't already exist
+            if lead.status == "converted" and not Client.objects.filter(email=lead.email).exists():
+                Client.objects.create(
+                    first_name=lead.first_name,
+                    last_name=lead.last_name,
+                    email=lead.email,
+                    phone_number=lead.phone_number,
+                    source=lead.source,
+                    created_by=request.user  # Track which user converted the lead
+                )
+                 # Update the converted_at and converted_by fields
+                lead.converted_at = timezone.now()  # Ensure you have 'timezone' imported
+                lead.converted_by = request.user
+                lead.save()
+
+                messages.success(request, "Lead converted to client successfully!")
+
 
             # Always allow users to create or update communication
             if communication_form.is_valid():
