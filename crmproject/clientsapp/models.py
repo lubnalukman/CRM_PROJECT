@@ -1,6 +1,8 @@
 from django.db import models
 from leadsapp.models import *
 from django.contrib.auth.models import User
+from django.conf import settings
+
 
 # Create your models here.
 class Client(models.Model):

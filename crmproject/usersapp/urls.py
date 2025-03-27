@@ -16,10 +16,12 @@ urlpatterns = [
     path('manager/dashboard/',views.manager_dashboard, name='manager_dashboard'),
     path('salesrep/dashboard/',views.salesrep_dashboard, name='salesrep_dashboard'),
     path('viewer/dashboard/', views.viewer_dashboard, name='viewer_dashboard'),
-    path('users/', views.all_users, name='all_users'),
+    path('users/', views.users_list, name='users_list'),
     path('user/<int:user_id>/', views.user_detail, name='user_detail'),
     path('users/create/', views.create_user, name='create_user'),
     path('users/edit/<int:user_id>/', views.edit_user, name='edit_user'),
     path('users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
     path('profile/', views.user_profile, name='user_profile'),
+    path('search/', views.search, name='search'),
+
 ]

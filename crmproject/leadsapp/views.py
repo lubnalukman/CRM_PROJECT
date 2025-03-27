@@ -15,17 +15,19 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 @login_required
-def all_leads(request):
+def leads_list(request):
     user = request.user
+    status_filter = request.GET.get('status')  # Get status filter from URL query parameters
 
     if user.user_type in ['admin', 'sales_manager']:
-        # Admin and Sales Managers can view all leads
-        leads = Lead.objects.all()
+        leads = Lead.objects.all()  # Admin & Sales Managers see all leads
     else:
-        # Sales Representatives can only see assigned leads
-        leads = Lead.objects.filter(assigned_to=user)
+        leads = Lead.objects.filter(assigned_to=user)  # Sales Reps see only assigned leads
 
-    return render(request, 'all_leads.html', {'leads': leads})
+    if status_filter:  # Apply status filter if it exists
+        leads = leads.filter(status=status_filter)
+
+    return render(request, 'leads_list.html', {'leads': leads})
 
 @login_required
 def create_lead(request):
@@ -49,7 +51,7 @@ def create_lead(request):
 
             # ✅ Assign Multiple Users to `assigned_to`
             assigned_user_ids = request.POST.getlist('assigned_to')  # Get multiple selected users
-            users = User.objects.filter(id__in=assigned_user_ids)  # Fetch users from DB
+            users = User.objects.filter(id__in=assigned_user_ids,user_type__in=['sales_rep', 'sales_manager'])  # Fetch users from DB
             lead.assigned_to.set(users)  # ✅ Assign multiple users
 
             communication, created = Communication.objects.update_or_create(
@@ -64,7 +66,7 @@ def create_lead(request):
             )
 
             messages.success(request, "Lead and initial communication details created successfully!")
-            return redirect('all_leads')
+            return redirect('leads_list')
         else:
             print(" lead Form Errors:", lead_form.errors)
             print("Communication Form Errors:", communication_form.errors)
@@ -74,7 +76,7 @@ def create_lead(request):
         lead_form = LeadForm()
         communication_form = CommunicationForm()
 
-    users = User.objects.all()  # Fetch all users for selection
+    users = User.objects.filter(user_type__in=['sales_rep', 'sales_manager'])  # Fetch all users for selection
     lead_sources = LeadSource.objects.all()  # Fetch LeadSource options
 
     return render(request, 'create_lead.html', {

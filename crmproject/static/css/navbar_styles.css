@@ -20,13 +20,7 @@ body {
 }
 
 /* Bottom Navbar Fix */
-.bottom-navbar {
-    background: white;
-    border-bottom: 1px solid #ddd;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+
 
 /* Ensure form moves right below bottom-navbar */
 .form-container {
@@ -69,13 +63,13 @@ form label {
 
 /* Top Bar Styling */
 .topbar {
-   
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: white;
+    background: #1e1e2d;
+   
     padding: 10px 20px;
-    color: black;
+    color:white;
     border-bottom: 1px solid #ddd;
     z-index: 1000;
 }
@@ -84,6 +78,7 @@ form label {
 .topbar .logo {
     font-size: 22px;
     font-weight: bold;
+    color: white;
 }
 
 /* Search Bar */

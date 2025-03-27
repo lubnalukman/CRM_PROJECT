@@ -19,13 +19,6 @@ body {
 }
 
 /* Bottom Navbar Fix */
-.bottom-navbar {
-    background: white;
-    border-bottom: 1px solid #ddd;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
 
 /* Ensure form moves right below bottom-navbar */
 .form-container {
@@ -67,19 +60,23 @@ form label {
 }
 
 /* Top Bar Styling */
+
 .topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: white;
+    background: #1e1e2d;
+   
     padding: 10px 20px;
-    color: black;
+    color: white /* Change text color to white for contrast */
 }
+
 
 /* Logo Styling */
 .topbar .logo {
     font-size: 22px;
     font-weight: bold;
+    color: white;
 }
 
 /* Search Bar */
@@ -99,6 +96,17 @@ form label {
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
+}
+.admin-text {
+    color: white; /* Change this to any color you want */
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.profile-icon {
+    font-size: 20px; /* Adjust icon size */
+    color: #fff; /* White color */
+    cursor: pointer;
 }
 
 /* Content Wrapper */
@@ -184,3 +192,7 @@ form label {
     font-weight: bold;
     color: #333;
 }
+
+
+
+

@@ -16,14 +16,15 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model 
 from django.contrib.auth.forms import AuthenticationForm
 import logging
+from clientsapp.models import Client
+from django.http import JsonResponse
+from django.db.models import Q
 
 
 def index(request):
     return render(request,"index.html")
 
 User = get_user_model()
-
-logger = logging.getLogger(__name__)
 
 def signup_user(request):
     if request.method == 'POST':
@@ -33,38 +34,8 @@ def signup_user(request):
             user = form.save(commit=False)
             user.user_type = 'viewer'  # Assign default user type
             user.save()
-
-            try:
-                # Fetch an existing LeadSource with 'web_form', or create if none exists
-                lead_source = LeadSource.objects.filter(source='web_form').first()
-                
-                if not lead_source:
-                    lead_source = LeadSource.objects.create(
-                        source='web_form',
-                        description='Leads from web form signups'
-                    )
-                
-                # Create the lead with user details
-                lead = Lead.objects.create(
-                    first_name=user.first_name,
-                    last_name=user.last_name,
-                    email=user.email,
-                    phone_number = form.cleaned_data.get('phone_number', ''),
-                    source=lead_source,  # Assign the LeadSource instance
-                    status='new',  # Default status
-                    assigned_to=None,  # No assigned user by default
-                    notes='',  # Empty string instead of None
-                    tags=''  # Empty string instead of None
-                )
-
-                # Redirect after successful signup
-                messages.success(request, "Signup successful! Please log in.")
-                return redirect('custom_login')  # Change to your actual dashboard URL
-
-            except Exception as e:
-                logger.error(f"Error creating lead: {e}") # Log the error
-                user.delete()  # Rollback user creation if lead creation fails
-                form.add_error(None, "An error occurred while creating the lead. Please try again.")
+            messages.success(request, "Signup successful! Please log in.")
+            return redirect('custom_login')  # Redirect to login page
 
     else:
         form = SignupForm()
@@ -144,7 +115,8 @@ def manager_dashboard(request):
     if request.user.user_type != 'sales_manager':
         return redirect('custom_login')  # Redirect if not a Sales Manager
 
-    return render(request, 'salesmanager_dashboard.html')
+    user=request.user
+    return render(request, 'salesmanager_dashboard.html',{'user':user})
 
 @login_required
 def salesrep_dashboard(request):
@@ -160,7 +132,7 @@ def viewer_dashboard(request):
 
 
 @login_required
-def all_users(request):
+def users_list(request):
     current_user = request.user
 
     # Determine which users to show based on user type
@@ -177,7 +149,7 @@ def all_users(request):
     page_obj = paginator.get_page(page_number)
     
 
-    return render(request, 'all_users.html', {'page_obj': page_obj})
+    return render(request, 'users_list.html', {'page_obj': page_obj})
 
 @login_required
 def create_user(request):
@@ -192,7 +164,7 @@ def create_user(request):
             user = form.save(commit=False)
             user.set_password(password1)  # Set the password
             user.save()  # Save the user object
-            return redirect('all_users')
+            return redirect('users_list')
     else:
         form = UserForm()
     
@@ -213,7 +185,7 @@ def edit_user(request, user_id):
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('all_users')
+            return redirect('users_list')
         else:
             print(form.errors)  # Debugging
     else:
@@ -237,7 +209,7 @@ def delete_user(request, user_id):
         user.delete()
         messages.success(request, "Sales Representative deleted successfully.")
 
-    return redirect('all_users')
+    return redirect('users_list')
 
 @login_required
 def user_detail(request, user_id):
@@ -320,3 +292,22 @@ def verify_otp(request):
             return redirect('verify_otp')
     return render(request, 'registration/verify_otp.html')
 
+def search(request):
+    query = request.GET.get('q', '')
+
+    # Search in the Lead model using first_name and last_name
+    leads = Lead.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query))
+    clients = Client.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query))
+    # Search in the Client model using first_name and last_name
+
+    # Search in the User model using username
+    users = User.objects.filter(username__icontains=query)
+
+    # Prepare data for JSON response with combined name for leads and clients
+    result_data = {
+        'leads': [{'id': lead.id, 'name': f'{lead.first_name} {lead.last_name}'} for lead in leads],
+        'clients': [{'id': client.id, 'name': f'{client.first_name} {client.last_name}'} for client in clients],
+        'users': [{'id': user.id, 'username': user.username} for user in users],
+    }
+
+    return JsonResponse(result_data)
