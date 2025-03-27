@@ -17,11 +17,14 @@
     <div class="topbar">
         <div class="logo">ABC Company CRM</div>
         <div class="icons" style="position: relative;">
-            <input type="text" class="form-control search-bar" id="search-input" placeholder="Search..." aria-label="Search">
-            <button class="btn btn-primary" id="search-button">Search</button>
-            <button class="btn btn-dark">
-                <i class="bi bi-bell"></i>
-            </button>
+            <div class="ms-auto d-flex align-items-center">
+                <input type="text" class="form-control search-bar me-2" id="search-input" placeholder="Search..." aria-label="Search" style="width: 200px;">
+                <button class="btn btn-close-white" id="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="btn btn-dark">
+                    <i class="bi bi-bell"></i>
+                 </button>
             <div id="search-results-container" class="search-results-container"></div>
         </div>
 

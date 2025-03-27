@@ -1,7 +1,7 @@
 .search-results-container {
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0;
     background: white;
     border: 1px solid #ccc;
     width: 300px;
@@ -23,4 +23,9 @@
 }
 .search-results-container .dropdown-item:hover {
     background: #f8f9fa;
+}
+#search-input {
+    min-width: 350px; /* Minimum width */
+    width: 100%; /* Will expand to container */
+    max-width: 400px; /* Maximum width to prevent it getting too wide */
 }

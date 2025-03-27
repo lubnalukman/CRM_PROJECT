@@ -146,7 +146,7 @@ def edit_lead(request, lead_id):
 def delete_lead(request, lead_id):
     lead = get_object_or_404(Lead, id=lead_id)
     lead.delete()
-    return redirect('admin_dashboard')
+    return redirect('lead_list')
 
 @login_required
 def lead_detail(request, lead_id):
