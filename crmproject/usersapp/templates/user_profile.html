@@ -41,7 +41,7 @@
             <p><strong>Last Name:</strong> {{ user.last_name }}</p>
             <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
 
-            <button class="btn btn-primary btn-hover" onclick="toggleEdit()">Edit Profile</button>
+            <button class="btn btn-dark btn-hover" onclick="toggleEdit()">Edit Profile</button>
         </div>
 
         <!-- Edit Form (Hidden Initially) -->
@@ -67,7 +67,7 @@
                 <label class="form-label" for="id_phone_number">Phone Number</label>
                 {{ form.phone_number }}
             </div>
-            <button type="submit" class="btn btn-success btn-hover">Save Changes</button>
+            <button type="submit" class="btn btn-dark btn-hover">Save Changes</button>
             <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
         </form>
     </div>

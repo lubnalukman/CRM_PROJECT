@@ -6,7 +6,11 @@
     <title>Create Lead SOurce</title>
   </head>
   <body> 
-
+    <div class="relative mt-4 ml-6">
+        <button onclick="window.history.back()" class="btn btn-outline-secondary">
+            ← Go Back
+        </button>
+    </div>
     <div class="container mt-5">
         <h2 class="text-center">Create Lead Source</h2>
         <form method="post" class="space-y-2">
@@ -22,14 +26,10 @@
                 {{ form.description }}
             </div>
 
-            <button type="submit" class="bg-blue-500 text-black px-4 py-2 rounded-lg w-full hover:bg-blue-600 transition">
+            <button type="submit" class="bg-dark text-white px-4 py-2 rounded-lg w-full hover:bg-blue-600 transition">
                 Create Source
             </button>
         </form>
-
-        <a href="{% url 'lead_source' %}" class="block text-center text-blue-500 mt-4 hover:underline">
-            View All Sources
-        </a>
     </div>
 </div>
 </body>

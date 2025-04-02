@@ -100,6 +100,17 @@ form label {
     object-fit: cover;
 }
 
+.admin-text {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.profile-icon {
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+}
 /* Content Wrapper */
 .content {
     flex: 1;

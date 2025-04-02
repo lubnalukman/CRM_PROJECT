@@ -31,7 +31,7 @@
                 <td>{{ source.source }}</td>
                 <td>{{ source.description }}</td>
                 <td>
-                    <a href="{% url 'edit_lead_source' source.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'edit_lead_source' source.id %}" class="btn btn-dark btn-sm">Edit</a>
                     {% if user.user_type == "admin" or user.user_type == "sales_manager" %}
                     <form action="{% url 'delete_lead_source' source.id %}" method="post" style="display:inline;">
                        
@@ -45,7 +45,7 @@
         </tbody>
     </table>
     {% if user.user_type == "admin" or user.user_type == "sales_manager" %}
-    <a href="{% url 'create_lead_source' %}" class="btn btn-success">Add New Lead Source</a>
+    <a href="{% url 'create_lead_source' %}" class="btn btn-dark">Add New Lead Source</a>
     {% endif %}
 </div>
 

@@ -9,7 +9,7 @@ from django.conf import settings
 import random
 from django.core.mail import send_mail
 from .forms import SignupForm
-from leadsapp.models import Lead, LeadSource
+from leadsapp.models import Lead, LeadSource,Notification
 from django.contrib.auth.decorators import login_required
 from usersapp.forms import UserForm,UserProfileForm, UserEditForm
 from django.core.paginator import Paginator
@@ -36,7 +36,14 @@ def signup_user(request):
             user.save()
             messages.success(request, "Signup successful! Please log in.")
             return redirect('custom_login')  # Redirect to login page
+        else:
+            # Print errors in the console
+            print("Form Errors:", form.errors)
 
+            # Show errors on the page
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
     else:
         form = SignupForm()
 
@@ -108,21 +115,86 @@ def user_profile(request):
 def admin_dashboard(request):
     if request.user.user_type != 'admin':
         return redirect('custom_login')  # Or some unauthorized page
-    return render(request, 'admin_dashboard.html')
+
+    # Fetch latest 5 clients and leads
+    recent_clients = Client.objects.order_by('-created_at')[:2]
+    recent_leads = Lead.objects.order_by('-created_at')[:2]
+    notifications = Notification.objects.filter(user=request.user, is_read=False)
+
+    # Count statistics
+    total_clients = Client.objects.count()
+    total_leads = Lead.objects.count()
+    total_users = User.objects.count()  # Total registered users
+    interested_leads = Lead.objects.filter(status='interested').count()  # Assuming 'status' field
+
+    context = {
+        'recent_clients': recent_clients,
+        'recent_leads': recent_leads,
+        'total_clients': total_clients,
+        'total_leads': total_leads,
+        'total_users': total_users,
+        'interested_leads': interested_leads,
+        'notifications': notifications
+    }
+    
+    return render(request, 'admin_dashboard.html', context)
 
 @login_required
 def manager_dashboard(request):
     if request.user.user_type != 'sales_manager':
         return redirect('custom_login')  # Redirect if not a Sales Manager
+   
+    recent_clients = Client.objects.order_by('-created_at')[:2]
+    recent_leads = Lead.objects.order_by('-created_at')[:2]
+    notifications = Notification.objects.filter(user=request.user, is_read=False)
 
-    user=request.user
-    return render(request, 'salesmanager_dashboard.html',{'user':user})
+    # Count statistics
+    total_clients = Client.objects.count()
+    total_leads = Lead.objects.count()
+    total_users = User.objects.count()  # Total registered users
+    interested_leads = Lead.objects.filter(status='interested').count()  # Assuming 'status' field
+
+    context = {
+        'recent_clients': recent_clients,
+        'recent_leads': recent_leads,
+        'total_clients': total_clients,
+        'total_leads': total_leads,
+        'total_users': total_users,
+        'interested_leads': interested_leads,
+        'notifications': notifications
+    }
+    
+    return render(request, 'salesmanager_dashboard.html', context)
+   
 
 @login_required
 def salesrep_dashboard(request):
     if request.user.user_type != 'sales_rep':
         return redirect('custom_login')
-    return render(request, 'salesrep_dashboard.html')
+
+    # Fetch clients created by the logged-in sales rep
+    recent_clients = Client.objects.filter(created_by=request.user).order_by('-created_at')[:1]
+
+    # Fetch leads assigned to the sales rep, but only if the related client was created by them
+    recent_leads = Lead.objects.filter(assigned_to=request.user).order_by('-created_at')[:1]
+    notifications = Notification.objects.filter(user=request.user, is_read=False)
+
+    # Count statistics (only for their assigned leads and created clients)
+    total_clients = Client.objects.filter(created_by=request.user).count()
+    total_leads = Lead.objects.filter(assigned_to=request.user).count()
+    interested_leads = Lead.objects.filter(assigned_to=request.user,status='interested').count()
+
+    context = {
+        'recent_clients': recent_clients,
+        'recent_leads': recent_leads,
+        'total_clients': total_clients,
+        'total_leads': total_leads,
+        'interested_leads': interested_leads,
+        'notifications': notifications
+    }
+
+    return render(request, 'salesrep_dashboard.html', context)
+   
 
 @login_required
 def viewer_dashboard(request):

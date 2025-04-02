@@ -54,7 +54,7 @@ class Communication(models.Model):
 
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='communications')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='communications')
-    interaction_type = models.CharField(max_length=50, choices=INTERACTION_TYPES)
+    interaction_type = models.CharField(max_length=50, choices=INTERACTION_TYPES, default='email')
     subject = models.CharField(max_length=255, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -69,3 +69,9 @@ class Communication(models.Model):
 
     def __str__(self):
         return f"{self.interaction_type} with {self.lead} on {self.timestamp.strftime('%Y-%m-%d')}"
+
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)

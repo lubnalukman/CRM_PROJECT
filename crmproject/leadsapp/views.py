@@ -2,7 +2,7 @@
 from usersapp.views import custom_login
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Lead, LeadSource, User,Communication
+from .models import Lead, LeadSource, User,Communication,Notification
 from .forms import LeadForm,CommunicationForm
 from django.core.paginator import Paginator
 from .forms import LeadSourceForm
@@ -11,6 +11,8 @@ from django.utils import timezone
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import get_user_model 
+from django.core.mail import send_mail
+from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -33,76 +35,87 @@ def leads_list(request):
 def create_lead(request):
     if request.method == 'POST':
         lead_form = LeadForm(request.POST)
-        communication_form=CommunicationForm(request.POST)
 
-        if lead_form.is_valid() and communication_form.is_valid():
-            lead = lead_form.save(commit=False)  # Don't save yet
+        if lead_form.is_valid():
+            lead = lead_form.save(commit=False)  
 
-            # ✅ Assign Lead Source
-            source_id = request.POST.get('source')
-            if source_id:
-                try:
-                    lead.source = LeadSource.objects.get(id=source_id)  # Assign LeadSource
-                except LeadSource.DoesNotExist:
-                    messages.error(request, "Invalid source selected.")
-                    return redirect('create_lead')
+            lead.source = lead_form.cleaned_data["source"]  
+            lead.save() 
 
-            lead.save()  # ✅ Save Lead before assigning ManyToMany field
-
-            # ✅ Assign Multiple Users to `assigned_to`
+            #  Assign Multiple Users to `assigned_to`
             assigned_user_ids = request.POST.getlist('assigned_to')  # Get multiple selected users
             users = User.objects.filter(id__in=assigned_user_ids,user_type__in=['sales_rep', 'sales_manager'])  # Fetch users from DB
-            lead.assigned_to.set(users)  # ✅ Assign multiple users
+            lead.assigned_to.set(users)  # Assign multiple users
 
-            communication, created = Communication.objects.update_or_create(
-                lead=lead,
-                created_by=request.user,  # Ensure uniqueness per user
-                defaults={
-                    'interaction_type': communication_form.cleaned_data['interaction_type'],
-                    'subject': communication_form.cleaned_data['subject'],
-                    'notes': communication_form.cleaned_data['notes'],
-                    'updated_by': request.user,  # Update user
-                }
-            )
-
-            messages.success(request, "Lead and initial communication details created successfully!")
+            #  Create a default communication entry
+            if not Communication.objects.filter(lead=lead).exists():
+                Communication.objects.create(
+                    lead=lead,
+                    created_by=request.user,  #  Track the user who created it
+                    interaction_type="email",  # Ensure lowercase matches the model choices
+                    subject="Initial Contact",
+                    notes="Follow-up required."
+                )
+            notify_users(lead)
+            messages.success(request, "Lead created successfully!")
             return redirect('leads_list')
         else:
             print(" lead Form Errors:", lead_form.errors)
-            print("Communication Form Errors:", communication_form.errors)
-
             messages.error(request, "There was an error creating the lead. Please check the form.")
     else:
         lead_form = LeadForm()
-        communication_form = CommunicationForm()
-
+       
     users = User.objects.filter(user_type__in=['sales_rep', 'sales_manager'])  # Fetch all users for selection
     lead_sources = LeadSource.objects.all()  # Fetch LeadSource options
 
-    return render(request, 'create_lead.html', {
-        'lead_form': lead_form,
-        'communication_form': communication_form,
-        'users': users,
-        'lead_sources': lead_sources
-    })
-   
+    return render(request, 'create_lead.html', {'lead_form': lead_form,'users': users,'lead_sources': lead_sources})
+
+@login_required
+def edit_communication(request, lead_id, communication_id):
+    lead = get_object_or_404(Lead, id=lead_id)
+    communication = get_object_or_404(Communication, id=communication_id, lead=lead)
+
+    if request.method == "POST":
+        form = CommunicationForm(request.POST, request.FILES, instance=communication)
+        if form.is_valid():
+            form.save()
+            return redirect('lead_detail', lead_id=lead.id)  # Redirect back to lead details page
+    else:
+        form = CommunicationForm(instance=communication)
+
+    return render(request, 'edit_communication.html', {'form': form, 'lead': lead, 'communication': communication})
+
 @login_required
 def edit_lead(request, lead_id):
     lead = get_object_or_404(Lead, id=lead_id) 
     users=User.objects.filter(user_type__in=['sales_manager', 'sales_rep']) # Get the specific lead
- 
-  # Fetch the latest communication entry for this lead, if it exists
-    communication = Communication.objects.filter(lead=lead).order_by('-timestamp').first()
+    assigned_users = set(lead.assigned_to.all()) 
 
     if request.method == "POST":
         lead_form = LeadForm(request.POST, instance=lead)
-        communication_form = CommunicationForm(request.POST, request.FILES,instance=communication)
-
+    
         if lead_form.is_valid():
             lead_form.save()
 
-             # Check if lead is converted and Client doesn't already exist
-            if lead.status == "converted" and not Client.objects.filter(email=lead.email).exists():
+            new_assigned_users = set(lead.assigned_to.all()) - assigned_users
+            # ✅ Notify newly assigned sales representatives
+            for user in new_assigned_users:
+                # System Notification
+                Notification.objects.create(
+                    user=user,
+                    message=f"You have been assigned to lead: {lead.first_name} {lead.last_name}."
+                )
+
+                # Email Notification
+                send_mail(
+                    subject="New Lead Assignment",
+                    message=f"You have been assigned to a lead: {lead.first_name} {lead.last_name}. Please follow up accordingly.",
+                    from_email="dhibilu@gmail.com",
+                    recipient_list=[user.email],
+                    fail_silently=True
+                )
+
+            if lead.status == "converted" and not Client.objects.filter(email=lead.email).exists(): # Check if lead is converted and Client doesn't already exist
                 Client.objects.create(
                     first_name=lead.first_name,
                     last_name=lead.last_name,
@@ -118,24 +131,12 @@ def edit_lead(request, lead_id):
 
                 messages.success(request, "Lead converted to client successfully!")
 
-
-            # Always allow users to create or update communication
-            if communication_form.is_valid():
-                communication = communication_form.save(commit=False)
-                communication.lead = lead  # Associate the communication with the lead
-                if not communication.created_by:  # Ensure created_by is set only if it's empty
-                    communication.created_by = request.user
-                communication.updated_by = request.user 
-                communication.save()
-
             return redirect("lead_detail", lead_id=lead.id)
     else:
         lead_form = LeadForm(instance=lead)  # Populate form with existing data
-        communication_form = CommunicationForm(instance=communication)  # Empty communication form
 
     context = {
         'lead_form': lead_form,
-        'communication_form': communication_form,
         'lead': lead,   
         'users':users
     }
@@ -150,15 +151,15 @@ def delete_lead(request, lead_id):
 
 @login_required
 def lead_detail(request, lead_id):
-    # Fetch the lead or return a 404 error
+    # Fetch the lead and communication or return a 404 error
     lead = get_object_or_404(Lead, id=lead_id)
-
-    # Fetch related communications for this lead
     communications = Communication.objects.filter(lead=lead).order_by('-timestamp')
+    communication_form = CommunicationForm()
 
     return render(request, 'lead_detail.html', {
         'lead': lead,
         'communications': communications,
+        'communication_form': communication_form,
     })
 
 def lead_source_list(request):
@@ -196,3 +197,47 @@ def delete_lead_source(request, source_id):
         source.delete()
     return redirect('lead_source')
 
+def notify_users(lead): 
+    admin_users = User.objects.filter(user_type__in=['admin', 'sales_manager'])
+    
+    for user in admin_users:
+        Notification.objects.create(
+            user=user,
+            message=f"New lead added: {lead.first_name} {lead.last_name} from {lead.source.source}."
+        )
+
+        send_mail(
+            subject="New Lead Notification",
+            message=f"A new lead '{lead.first_name} {lead.last_name}' has been added from {lead.source.source}.",
+            from_email="dhibilu@gmail.com",
+            recipient_list=[user.email],
+            fail_silently=True
+        )
+
+    assigned_users = lead.assigned_to.all()
+    
+    for user in assigned_users:
+        Notification.objects.create(
+            user=user,
+            message=f"You have been assigned a new lead: {lead.first_name} {lead.last_name}."
+        )
+        send_mail(
+            subject="Lead Assignment Notification",
+            message=f"You have been assigned a new lead: '{lead.first_name} {lead.last_name}'. Please follow up accordingly.",
+            from_email="dhibilu@gmail.com",
+            recipient_list=[user.email],
+            fail_silently=True
+        )
+
+def mark_notifications_read(request):
+    if request.user.is_authenticated:
+        # Mark all unread notifications as read
+        notifications = Notification.objects.filter(user=request.user, is_read=False)
+        notifications.update(is_read=True)
+        
+        # Get the updated unread notification count
+        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+        
+        return JsonResponse({"success": True, "unread_count": unread_count})
+    
+    return JsonResponse({"success": False})

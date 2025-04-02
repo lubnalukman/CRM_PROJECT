@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | ABC CRM</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
     <style>
         /* General Reset */
         * {
@@ -131,6 +131,14 @@
     </style>
 </head>
 <body>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
     <div class="signup-container">
         <h2><i class="fas fa-user-plus"></i> Create an Account</h2>
         <form method="post">
@@ -140,6 +148,9 @@
                 <label for="id_username">Username:</label>
                 {{ form.username }}
                 <i class="fas fa-user"></i>
+                {% if form.username.errors %}
+        <span class="error">{{ form.username.errors.0 }}</span>
+    {% endif %}
             </div>
 
             <div class="input-group">
@@ -158,6 +169,9 @@
                 <label for="id_email">Email:</label>
                 {{ form.email }}
                 <i class="fas fa-envelope"></i>
+                {% if form.email.errors %}
+        <span class="error">{{ form.email.errors.0 }}</span>
+    {% endif %}
             </div>
 
             <div class="input-group">
@@ -170,6 +184,9 @@
                 <label for="id_password1">Password:</label>
                 {{ form.password1 }}
                 <i class="fas fa-lock"></i>
+                {% if form.password.errors %}
+        <span class="error">{{ form.password.errors.0 }}</span>
+    {% endif %}
             </div>
 
             <div class="input-group">

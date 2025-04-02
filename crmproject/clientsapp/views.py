@@ -47,11 +47,10 @@ def client_details(request, client_id):
     current_user = request.user
 
     # Admins can view all users
-    if current_user.user_type == 'admin':
+    if current_user.user_type in ['admin','sales_manager']:
         client = get_object_or_404(Client, id=client_id)
     else:
-        # Sales Managers can only view Sales Representatives
-        client = get_object_or_404(Client, id=client_id, user_type='sales_rep')
+        client = get_object_or_404(Client, id=client_id, created_by=current_user)
 
     return render(request, 'client_details.html', {'client': client})
 

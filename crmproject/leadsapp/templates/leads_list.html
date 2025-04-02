@@ -41,10 +41,10 @@
             align-items: center; 
             color: #ffffff;
             text-decoration: none;
-            padding: 12px 20px;
-            font-size: 15px;
+            padding: 16px 25px;
+            font-size: 17px;
             transition: all 0.3s ease;
-
+            margin-bottom: 10px; /* Increased space between items */
         }
 
         .sidebar a i {
@@ -55,7 +55,7 @@
 
         .sidebar a:hover, .sidebar a.active {
             background: #33334d;
-            border-left: 4px solid #4caf50;
+            border-left: 4px solid ;
             color: #ffffff;
         }
 
@@ -185,7 +185,9 @@
     <div class="content">
         <!-- Button Container -->
         <div class="button-container">
+            {% if user.user_type == 'admin' or user.user_type == 'sales_manager' %}
             <a href="{% url 'create_lead' %}" class="btn">Create Lead</a>
+            {% endif %}
             <a href="{% url 'lead_source' %}" class="btn btn-secondary">Lead Sources</a>
         </div>
 

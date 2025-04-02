@@ -42,7 +42,7 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="font-semibold text-gray-600">Created By:</span>
-                        <span class="text-gray-800">{{ comm.created_by.username|default:"-" }}</span>
+                        <span class="text-gray-800">{{ client.created_by.username|default:"-" }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="font-semibold text-gray-600">Created At:</span>
@@ -55,10 +55,10 @@
 
         <!-- Action Buttons -->
         <div class="mt-6 flex justify-end space-x-3">
-            <a href="{% url 'edit_client' client.id %}" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition">
+            <a href="{% url 'edit_client' client.id %}" class="bg-dark text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition">
                 Edit
             </a>
-            {% if user.user_type == "admin" or user.user_type == "sales_manager" %}
+            {% if user.user_type == "admin" or user.user_type == "sales_manager" or client.created_by == user %}
             <a href="{% url 'delete_client' client.id %}" class="text-red-600 hover:underline font-semibold">
                 Delete
             </a>
