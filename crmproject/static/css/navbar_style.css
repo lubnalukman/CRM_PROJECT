@@ -1,3 +1,4 @@
+/*base_styles.css*/
 body {
     display: flex;
     flex-direction: column;
@@ -5,26 +6,86 @@ body {
     margin: 0;
 }
 
-/* Topbar and Navbar styles (unchanged) */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Ensure the container starts right below the navbar */
+.container {
+    flex: 1;
+    margin-top: 0 !important;
+    padding-top: 10px;
+}
+
+/* Bottom Navbar Fix */
+
+
+/* Ensure form moves right below bottom-navbar */
+.form-container {
+    max-width: 1600px;
+    margin: 20px auto 0; /* Move form down below navbar */
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect for buttons */
+.btn-hover:hover {
+    background-color: #003366 !important; /* Dark Blue */
+    color: white !important;
+}
+
+/* Styling inputs & form elements */
+form input, form select, form textarea {
+    font-size: 14px;
+    padding: 8px;
+    width: 50%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Button styles */
+.btn-primary {
+    font-size: 14px;
+    padding: 8px 16px;
+    
+}
+
+/* Form Labels */
+form label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Top Bar Styling */
 .topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: #1e1e2d;
     padding: 10px 20px;
-    color: white;
+    color:white;
+    border-bottom: 1px solid #ddd;
+    z-index: 1000;
 }
 
+/* Logo Styling */
 .topbar .logo {
     font-size: 22px;
     font-weight: bold;
     color: white;
 }
 
+/* Search Bar */
 .topbar .search-bar {
     width: 40%;
 }
 
+/* Icons & Profile Styling */
 .topbar .icons {
     display: flex;
     align-items: center;
@@ -49,132 +110,29 @@ body {
     color: #fff;
     cursor: pointer;
 }
-
+/* Content Wrapper */
+.content {
+    flex: 1;
+    padding: 20px;
+}
+.bottom-navbar {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 999; /* Ensure it's below the topbar */
+}
+/* Navbar Link Hover Effect */
 .bottom-navbar .nav-link {
-    color: black !important;
+    color:black !important;
 }
 
 .bottom-navbar .nav-link:hover {
     text-decoration: underline;
 }
-
 .dropdown-menu {
-    z-index: 1050 !important;
-    position: absolute !important;
-}
-
-/* Adjusted Container Styling */
-.container {
-    flex: 1; /* Takes remaining space */
-    padding: 20px;
-    background: #f8f9fa;
-    overflow-y: auto; /* Scroll if content exceeds height */
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Space between sections */
-}
-
-/* Overview Cards */
-.card {
-    border: none;
-    border-radius: 10px;
-    background: #ffffff;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-.card-body {
-    padding: 20px; /* More padding for better spacing */
-    min-height: 150px; /* Increased to make cards more rectangular */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; /* Center content */
-    text-align: center;
-}
-
-.card-title {
-    font-size: 16px; /* Slightly larger for readability */
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    color: #ffffff;
-}
-
-.card-text.display-6 {
-    font-size: 1.5rem; /* Reduced to fit better */
-    font-weight: 700;
-    color: #ffffff;
-}
-
-/* Colors for cards */
-.bg-primary { background-color: #003366; }
-.bg-success { background-color: #28a745; }
-.bg-info { background-color: #17a2b8; }
-.bg-warning { background-color: #ffc107; }
-
-/* Card List Section */
-.list-section {
-    flex: 1; /* Allows section to grow and fill space */
-    overflow-y: auto; /* Scroll if needed */
-    padding: 15px;
-    background: #ffffff; /* Matches card background */
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.list-card {
-    background: #f8f9fa; /* Slightly different background for contrast */
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.list-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-}
-
-.list-card p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #212529;
-}
-
-.list-card p strong {
-    font-weight: bold;
-    color: #1e1e2d;
-}
-
-.no-data {
-    text-align: center;
-    color: #6c757d;
-    font-size: 14px;
-    padding: 15px;
-}
-
-/* Row and Column Adjustments */
-.row {
-    margin-bottom: 20px;
-}
-
-.col-md-3, .col-md-6 {
-    padding: 0 15px;
-}
-
-/* Card Header for List Sections */
-.card-header {
-    padding: 10px 15px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #ffffff;
+    z-index: 1050 !important; /* Ensure the dropdown appears above other elements */
+    position: absolute !important; /* Prevents it from being affected by parent elements */
 }
 
 /* Notification Bell Button */
@@ -266,14 +224,13 @@ body {
 #notificationDropdown:not(.hidden) {
     display: block; /* Show when not hidden */
 }
-
 .search-results-container {
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0;
     background: white;
     border: 1px solid #ccc;
-    width: 100px;
+    width: 300px;
     max-height: 250px;
     overflow-y: auto;
     display: none;

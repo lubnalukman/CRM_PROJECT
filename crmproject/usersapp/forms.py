@@ -10,10 +10,6 @@ class PhoneNumberMixin:
         if not phone_number:  # If the field is empty, return None
             return None
         return phone_number
-        '''if phone_number:
-            if not phone_number.is_valid():
-                raise ValidationError("Enter a valid phone number.")
-        return phone_number'''
 
 
 class SignupForm(UserCreationForm, PhoneNumberMixin):

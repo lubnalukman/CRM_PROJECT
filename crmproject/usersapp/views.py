@@ -95,19 +95,8 @@ def user_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully!")
-            if user.user_type == "admin":
-                return redirect('admin_dashboard')
-            elif user.user_type == "sales_manager":
-                return redirect('manager_dashboard')
-            elif user.user_type == "sales_rep":
-                return redirect('salesrep_dashboard')
-            elif user.user_type == "viewer":
-                return redirect('viewer_dashboard')
-            return redirect('user_profile')
-        else:
-            messages.error(request, "Error updating profile. Please check the form.")
     else:
-        form = UserProfileForm(instance=user)  # Prefill form with user data
+        form = UserProfileForm(instance=user)  
 
     return render(request, 'user_profile.html', {'form': form})
 
@@ -116,7 +105,7 @@ def admin_dashboard(request):
     if request.user.user_type != 'admin':
         return redirect('custom_login')  # Or some unauthorized page
 
-    # Fetch latest 5 clients and leads
+    # Fetch latest  clients and leads
     recent_clients = Client.objects.order_by('-created_at')[:2]
     recent_leads = Lead.objects.order_by('-created_at')[:2]
     notifications = Notification.objects.filter(user=request.user, is_read=False)
@@ -364,18 +353,53 @@ def verify_otp(request):
             return redirect('verify_otp')
     return render(request, 'registration/verify_otp.html')
 
-def search(request):
+def search(request): 
     query = request.GET.get('q', '')
+    user = request.user
 
-    # Search in the Lead model using first_name and last_name
-    leads = Lead.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query))
-    clients = Client.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query))
-    # Search in the Client model using first_name and last_name
+    # Default empty querysets
+    leads = Lead.objects.none()
+    users = User.objects.none()
+    clients = Client.objects.none()
 
-    # Search in the User model using username
-    users = User.objects.filter(username__icontains=query)
+    if user.user_type == 'Sales Representative':
+        leads = Lead.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query),
+            assigned_to=user
+        )
 
-    # Prepare data for JSON response with combined name for leads and clients
+        clients = Client.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query),
+            Q(assigned_to=user) | Q(created_by=user)
+        )
+
+    elif user.user_type == 'Sales Manager':
+        leads = Lead.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        )
+
+        clients = Client.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        )
+
+        users = User.objects.filter(
+            Q(username__icontains=query),
+            user_type='Sales Representative'
+        )
+
+    else:  # For Admin or others
+        leads = Lead.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        )
+
+        clients = Client.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        )
+
+        users = User.objects.filter(
+            Q(username__icontains=query)
+        )
+
     result_data = {
         'leads': [{'id': lead.id, 'name': f'{lead.first_name} {lead.last_name}'} for lead in leads],
         'clients': [{'id': client.id, 'name': f'{client.first_name} {client.last_name}'} for client in clients],

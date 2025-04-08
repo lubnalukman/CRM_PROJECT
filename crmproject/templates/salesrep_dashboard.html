@@ -22,13 +22,14 @@
             <button class="btn btn-close-white" id="search-button">
                 <i class="fas fa-search"></i>
             </button>
+            <div id="search-results-container" class="search-results-container"></div>
              <!-- Notification Bell Button -->
-             <button id="notificationBtn" class="relative p-2 bg-dark text-white rounded-full">
+             <button id="notificationBtn" class="relative p-2 bg-dark text-white rounded-full"  style="position: relative;">
                 <i class="bi bi-bell"></i>
              {% if notifications %}
-             <span id="notificationCount" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full">
+             <span id="notificationCount" class="absolute -top-0 -right-0 bg-red-600 text-white text-xs px-2 py-1 rounded-full">
                     {{ notifications.count }}
-                                 </span>
+             </span>
              {% endif %}
             </button>
 
@@ -50,13 +51,9 @@
                 </div>
             </div>
         </div>
-            
-        <div id="search-results-container" class="search-results-container"></div>
-    </div>
-   
-
+     
         <div class="dropdown ms-3">
-            <img src="https://via.placeholder.com/40" alt="{{ user.first_name }}{{ user.last_name }}" class="profile-pic dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown">
+            <img src= "{% static 'images/profile.png' %}" alt="{{ user.first_name }}{{ user.last_name }}" class="profile-pic dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown">
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
                 <li><a class="dropdown-item" href="{% url 'reset_password' %}">Reset Password</a></li>
@@ -64,7 +61,7 @@
                 <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
             </ul>
         </div>
-    
+    </div>
 </div>
 
 <!-- Bottom Navbar (Moved Below Topbar) -->

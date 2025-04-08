@@ -17,18 +17,23 @@
 </head>
 <body>
     <div class="relative mt-4 ml-6">
-        <button onclick="window.history.back()" class="btn btn-outline-secondary">
-            ← Go Back
-        </button>
+        {% if user.user_type == "admin" %}
+            <h4><a class="nav-link me-4" href="{% url 'admin_dashboard' %}">←</a>Back</h4>
+        {% elif user.user_type == "sales_manager" %}
+            <h4><a class="nav-link me-4" href="{% url 'manager_dashboard' %}">←</a>Back</h4>
+        {% elif user.user_type == "sales_rep" %}
+            <h4><a class="nav-link me-4" href="{% url 'salesrep_dashboard' %}">←</a>Back</h4>
+        {% elif user.user_type == "viewer" %}
+            <h4><a class="nav-link me-4" href="{% url 'viewer_dashboard' %}">←</a>Back</h4>
+        {% endif %}
     </div>
-
     <div class="container mt-4">
         <h2>User Profile</h2>
-
-        {% if messages %}
+          {% if messages %}
             {% for message in messages %}
                 <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
                     {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -88,5 +93,5 @@
     </script>
     <!-- Bootstrap JavaScript (required for dropdowns to work) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</h3>
+</h3>
