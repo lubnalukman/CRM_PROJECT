@@ -1,4 +1,5 @@
 {% include 'navbar.html' %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,131 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
     <title>Leads List</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            background: #f4f5f7;
-            display: flex;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: 80px;
-            height: 100vh;
-            background: #1e1e2d;
-            padding-top: 150px;
-            position: fixed;
-            top: 50px;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-        
-        .sidebar h2 {
-            color: white;
-        }
-        
-        .sidebar a {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 16px 25px;
-            font-size: 17px;
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-
-        .sidebar a i {
-            margin-right: 12px;
-            font-size: 18px;
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background: #33334d;
-            border-left: 4px solid;
-            color: #ffffff;
-        }
-
-        /* Main Content */
-        .content {
-            margin-left: 80px;
-            padding: 20px;
-            width: calc(100% - 80px);
-            min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-
-        /* Lead Card Styling */
-        .lead-card {
-            background: #ffffff;
-            border-radius: 12px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 150px; /* Fixed height for consistency */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .lead-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .lead-card .card-body {
-            padding: 15px;
-            text-align: center;
-        }
-
-        .lead-card .card-title {
-            margin: 0;
-            color: #03253c;
-            font-weight: bold;
-        }
-
-        /* Button Styling */
-        .button-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 6px;
-            background: #1e1e2d;
-            color: white;
-            transition: background 0.3s ease, transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 5px;
-        }
-
-        .btn:hover {
-            background: #0056b3;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #1e1e2d;
-        }
-
-        .btn-secondary:hover {
-            background: #0056b3;
-        }
-        
-    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -174,6 +52,11 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ lead.first_name }} {{ lead.last_name }}</h5>
                                 <a href="{% url 'lead_detail' lead.id %}" class="stretched-link text-decoration-none"></a>
+                                {% if lead.tags %}
+                                <div class="mt-2">
+                                    <span class="badge bg-primary me-1">{{ lead.tags }}</span>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
