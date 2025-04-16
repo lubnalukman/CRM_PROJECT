@@ -8,6 +8,7 @@ urlpatterns = [
     path('',views.index,name='index'),
     path('request_otp/', request_otp, name='request_otp'),
     path('verify_otp/', verify_otp, name='verify_otp'),
+    path('verify-email/<uidb64>/<token>/', views.verify_email, name='verify_email'),
     path('reset_password/', reset_password, name='reset_password'),
     path('accounts/logout/',views.logout_user,name='logout'),
     path('signup/',views.signup_user, name='signup'), 

@@ -2,7 +2,6 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
-#from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from django.conf import settings
@@ -17,8 +16,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 import logging
 from clientsapp.models import Client
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from django.db.models import Q
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.urls import reverse
 
 
 def index(request):
@@ -34,7 +38,8 @@ def signup_user(request):
             user = form.save(commit=False)
             user.user_type = 'viewer'  # Assign default user type
             user.save()
-            messages.success(request, "Signup successful! Please log in.")
+            send_verification_email(request, user)
+            messages.success(request, "Signup successful! Please check you email to verify your account.")
             return redirect('custom_login')  # Redirect to login page
         else:
             # Print errors in the console
@@ -59,6 +64,11 @@ def custom_login(request):
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
+                if not user.is_verified:
+                     return render(request, 'registration/login.html', {
+                        'form': form,
+                        'error_message': 'Please verify your email before logging in.'
+                    })
                 login(request, user)
                 # Redirect based on user type
                 if user.user_type == 'admin':
@@ -86,7 +96,37 @@ def custom_login(request):
         # GET request - show empty login form
         form = AuthenticationForm()
         return render(request, 'registration/login.html', {'form': form})
-    
+
+def send_verification_email(request, user):
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    verification_link = request.build_absolute_uri(
+        reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+    )
+    subject = 'Verify your email - CRM'
+    message = f"Hi {user.username},\n\nClick the link below to verify your email:\n{verification_link}"
+    from_email = 'noreply@yourcrm.com'
+    recipient_list = [user.email]
+
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+def verify_email(request, uidb64, token):
+    User = get_user_model()
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        user.is_verified = True
+        user.save()
+        messages.success(request, "✅ Your email has been verified. Please log in.")
+        return redirect('custom_login')  # Redirect to login with success message
+    else:
+        messages.error(request, "❌ Verification link is invalid or expired.")
+    return redirect('custom_login')
+
 @login_required
 def user_profile(request):
     user = request.user  # Get the logged-in user

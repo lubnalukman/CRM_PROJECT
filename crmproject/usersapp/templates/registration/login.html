@@ -135,6 +135,11 @@
 <body>
     <div class="login-container">
         <h2><i class="fas fa-user-circle"></i> Login</h2>
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
         {% if error_message %}
             <p class="error-message" style="color: red; font-size: 14px;">{{ error_message }}</p>
         {% endif %}
